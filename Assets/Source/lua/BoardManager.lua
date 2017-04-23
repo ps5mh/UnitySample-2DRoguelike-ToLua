@@ -17,7 +17,6 @@ end
 -- @function [parent=#BoardManager] GenerateLevel
 -- @param self
 function BoardManager:GenerateLevel(level)
-    print(123,level)
     local board_holder = UE.GameObject.New("board holder").transform
     -- generate floor
     for r=1, self.rows do for c = 1, self.columns do
