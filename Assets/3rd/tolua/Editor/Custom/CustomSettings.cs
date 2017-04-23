@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 public static class CustomSettings
 {
-    public static string saveDir = Application.dataPath + "/3rd/tolua/Source/Generate/";    
+    public static string saveDir = Application.dataPath + "/Source/Generate/";    
     public static string toluaBaseType = Application.dataPath + "/3rd/tolua/BaseType/";    
 
     //导出时强制做为静态类的类型(注意customTypeList 还要添加这个类型才能导出)
