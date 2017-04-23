@@ -1,6 +1,3 @@
 [submodule "proj/tolua-ldtdoc"]
 	path = proj/tolua-ldtdoc
 	url = https://github.com/ps5mh/tolua-ldtdoc.git
-[submodule "tolua"]
-	path = tolua
-	url = https://github.com/ps5mh/tolua.git
