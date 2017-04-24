@@ -1,26 +1,26 @@
 local UE = UnityEngine
-local GOInst = UE.GameObject.Instantiate
+local BlockingLayer = 8
 local instance
 ---
--- @module MovingOjbect
+-- @module MovingObject
 
 ---
--- @type MovingOjbect
+-- @type MovingObject
 -- @extends Game_MovingObject#MovingObject
-local MovingOjbect MovingOjbect = {__index = MovingOjbect}
+local MovingObject = {} MovingObject.__index = MovingObject
 
 ---
--- @function [parent=#MovingOjbect] Awake
+-- @function [parent=#MovingObject] Awake
 -- @param self
-function MovingOjbect:Awake()
+function MovingObject:Awake()
     self.c2d = self:GetComponent(typeof(UE.Collider2D)) -- UnityEngine_Collider2D#Collider2D
     self.inv_move_time = 1 / self.moveTime
 end
 
 ---
--- @function [parent=#MovingOjbect] Move
+-- @function [parent=#MovingObject] Move
 -- @param self
-function MovingOjbect:Move(dx,dy)
+function MovingObject:Move(dx,dy)
     self.c2d.enabled = false
     local b, e = self.transform.position, self.transform.position + Vector3(dx,dy,0)
     local hit = UE.Physics2D.Linecast(b, e, self.blockingLayer)
@@ -40,9 +40,9 @@ function MovingOjbect:Move(dx,dy)
 end
 
 ---
--- @function [parent=#MovingOjbect] AttemptMove
+-- @function [parent=#MovingObject] AttemptMove
 -- @param self
-function MovingOjbect:AttemptMove(dx,dy)
+function MovingObject:AttemptMove(dx,dy)
     local canmove, hit = self:Move(dx,dy)
     if not canmove and hit then
         self:onCantMove(hit)
@@ -50,9 +50,9 @@ function MovingOjbect:AttemptMove(dx,dy)
 end
 
 ---
--- @function [parent=#MovingOjbect] onCantMove
+-- @function [parent=#MovingObject] onCantMove
 -- @param self
-function MovingOjbect:onCantMove(hit)
+function MovingObject:onCantMove(hit)
 end
 
-return MovingOjbect
+return MovingObject

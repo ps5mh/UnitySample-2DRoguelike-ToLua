@@ -3,6 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : LuaBehaviour {
-    public int wallDamage;
+namespace Game {
+    public class Player : MovingObject {
+        public int wallDamage = 1;
+        public int pointsPerFood = 10;
+        public int pointsPerSoda = 20;
+        public float restartLevelDelay = 1;
+    }
 }

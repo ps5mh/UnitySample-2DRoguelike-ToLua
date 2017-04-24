@@ -7,7 +7,7 @@ local GameManager = require"GameManager"
 ---
 -- @type Loader
 -- @extends Game_Loader#Loader
-local Loader Loader = {__index = Loader}
+local Loader = {} Loader.__index = Loader
 
 ---
 -- @function [parent=#Loader] Do

@@ -5,8 +5,8 @@ local GOInst = UE.GameObject.Instantiate
 
 ---
 -- @type BoardManager
--- @extends Game_BoardManager#BoardManager
-local BoardManager BoardManager = { __index = BoardManager }
+-- @extends Game_LuaBehaviour#LuaBehaviour
+local BoardManager = {} BoardManager.__index = BoardManager
 
 ---
 -- @function [parent=#BoardManager] Awake

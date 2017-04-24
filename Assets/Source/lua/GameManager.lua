@@ -7,7 +7,7 @@ local instance
 ---
 -- @type GameManager
 -- @extends UnityEngine_MonoBehaviour#MonoBehaviour
-local GameManager GameManager = {__index = GameManager}
+local GameManager = {} GameManager.__index = GameManager
 
 ---
 -- @function [parent=#GameManager] Awake
@@ -19,10 +19,9 @@ function GameManager:Awake()
         self:Destroy()
     end
     self.level = 3
-    self.boardManager = self.gameObject:GetComponent(typeof(Game.BoardManager)) -- BoardManager#BoardManager
+    self.boardManager = GetLuaComponent(self.gameObject, "BoardManager") -- BoardManager#BoardManager
     UE.GameObject.DontDestroyOnLoad(self.gameObject)
     self.boardManager:GenerateLevel(self.level)
-    
 end
 
 ---

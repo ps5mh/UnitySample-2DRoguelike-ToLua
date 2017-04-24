@@ -49,10 +49,14 @@ public static class CustomSettings
         //-------------------------------------------------------------------
         
         _GT(typeof(UnityEngine.UI.Button)),
-        _GT(typeof(Game.BoardManager)),
         _GT(typeof(Game.Loader)),
         _GT(typeof(Game.MovingObject)),
+        _GT(typeof(Game.LuaBehaviour)),
+        _GT(typeof(Game.FloatFields)),
+        _GT(typeof(Game.GameObjectArrays)),
+        _GT(typeof(Game.GameObjects)),
         _GT(typeof(Game.Wall)),
+        _GT(typeof(Game.Player)),
         _GT(typeof(Collider2D)),
         _GT(typeof(Physics2D)),
         _GT(typeof(Sprite)),

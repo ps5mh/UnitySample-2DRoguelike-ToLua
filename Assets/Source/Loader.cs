@@ -8,7 +8,7 @@ namespace Game {
         new void Awake() {
         }
 
-        void Start() {
+        new void Start() {
         }
 
         public void ManualLuaAwake() {
