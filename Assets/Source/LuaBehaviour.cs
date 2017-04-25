@@ -6,26 +6,9 @@ using System.Collections;
 
 namespace Game {
     [Serializable]
-    public class FloatFields {
-        public string name;
-        public float value;
-    }
-    [Serializable]
-    public class GameObjectArrays {
-        public string name;
-        public GameObject[] value;
-    }
-    [Serializable]
-    public class GameObjects {
-        public string name;
-        public GameObject value;
-    }
-    [Serializable]
     public class LuaBehaviour : MonoBehaviour {
         public string luaModuleName;
-        public FloatFields[] floatValues;
-        public GameObjects[] gameObjects;
-        public GameObjectArrays[] gameobjectArrays;
+        public GenericProperty[] properties;
         private LuaTable peer;
         private static bool initialized = false;
         private static LuaFunction __awake;

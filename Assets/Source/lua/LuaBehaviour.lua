@@ -15,10 +15,7 @@ function LuaBehaviour.__bind(csharp_obj, lua_module_name)
     peer.__peer = peer
     peer.__lua_comp = require(lua_module_name)
     tolua.setpeer(csharp_obj, peer)
-    local self = csharp_obj
-    for _,v in ipairs(self.floatValues:ToTable()) do self[v.name] = v.value end
-    for _,v in ipairs(self.gameObjects:ToTable()) do self[v.name] = v.value end
-    for _,v in ipairs(self.gameobjectArrays:ToTable()) do self[v.name] = v.value end
+    for _,v in ipairs(csharp_obj.properties:ToTable()) do csharp_obj[v.name] = v:GetValue() end
     return peer
 end
 
