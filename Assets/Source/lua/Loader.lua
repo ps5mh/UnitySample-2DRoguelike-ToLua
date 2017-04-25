@@ -14,7 +14,7 @@ local Loader = {} Loader.__index = Loader
 -- @param self
 function Loader:Awake()
     if not GameManager.instance then
-        UE.GameObject.Instantiate(self.gameManager)
+        UE.GameObject.Instantiate(self.game_manager)
     end
 end
 

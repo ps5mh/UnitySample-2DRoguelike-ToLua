@@ -49,7 +49,6 @@ public static class CustomSettings
         //-------------------------------------------------------------------
         
         _GT(typeof(UnityEngine.UI.Button)),
-        _GT(typeof(Game.Loader)),
         _GT(typeof(Game.MovingObject)),
         _GT(typeof(Game.LuaBehaviour)),
         _GT(typeof(Game.FloatFields)),

@@ -8,7 +8,7 @@ local UE = UnityEngine
 LuaBehaviour = { __index = LuaBehaviour }
 
 ---
--- @function [parent=#LuaBehaviour] Awake
+-- @function [parent=#LuaBehaviour] __bind
 -- @param self
 function LuaBehaviour.__bind(csharp_obj, lua_module_name)
     local peer = setmetatable({}, require(lua_module_name))
