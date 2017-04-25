@@ -14,6 +14,7 @@ public static class LuaBinder
 		L.BeginModule("UnityEngine");
 		UnityEngine_Collider2DWrap.Register(L);
 		UnityEngine_Physics2DWrap.Register(L);
+		UnityEngine_RaycastHit2DWrap.Register(L);
 		UnityEngine_SpriteWrap.Register(L);
 		UnityEngine_SpriteRendererWrap.Register(L);
 		UnityEngine_ComponentWrap.Register(L);

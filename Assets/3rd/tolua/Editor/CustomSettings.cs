@@ -53,6 +53,7 @@ public static class CustomSettings
         _GT(typeof(GenericProperty)),
         _GT(typeof(Collider2D)),
         _GT(typeof(Physics2D)),
+        _GT(typeof(RaycastHit2D)),
         _GT(typeof(Sprite)),
         _GT(typeof(SpriteRenderer)),
         _GT(typeof(Debugger)).SetNameSpace(null), 

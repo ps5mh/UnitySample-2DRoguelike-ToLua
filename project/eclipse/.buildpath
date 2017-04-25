@@ -4,4 +4,5 @@
 	<buildpathentry kind="src" path="libs"/>
 	<buildpathentry kind="src" path="src"/>
 	<buildpathentry kind="src" path="doc"/>
+	<buildpathentry kind="con" path="org.eclipse.ldt.ExecutionEnvironmentContainer/lua/5.1"/>
 </buildpath>

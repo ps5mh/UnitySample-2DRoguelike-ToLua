@@ -29,7 +29,7 @@ public class GenericProperty {
         } else if (type == GenericPropertyType.GameObjectArray) {
             return goarrval;
         } else if (type == GenericPropertyType.LayerMask) {
-            return layermaskval;
+            return layermaskval.value;
         } else if (type == GenericPropertyType.Sprite) {
             return spriteval;
         }

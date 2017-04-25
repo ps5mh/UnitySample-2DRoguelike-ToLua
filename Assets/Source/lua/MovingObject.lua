@@ -1,5 +1,4 @@
 local UE = UnityEngine
-local BlockingLayer = 8
 local instance
 ---
 -- @module MovingObject
@@ -8,13 +7,16 @@ local instance
 -- @type MovingObject
 -- @extends Game_MovingObject#MovingObject
 local MovingObject = {} MovingObject.__index = MovingObject
+---
+-- @field [parent=#MovingObject] move_time
+-- @field [parent=#MovingObject] blocking_layer
 
 ---
 -- @function [parent=#MovingObject] Awake
 -- @param self
 function MovingObject:Awake()
     self.c2d = self:GetComponent(typeof(UE.Collider2D)) -- UnityEngine_Collider2D#Collider2D
-    self.inv_move_time = 1 / self.moveTime
+    self.inv_move_time = 1 / self.move_time
 end
 
 ---
@@ -23,14 +25,14 @@ end
 function MovingObject:Move(dx,dy)
     self.c2d.enabled = false
     local b, e = self.transform.position, self.transform.position + Vector3(dx,dy,0)
-    local hit = UE.Physics2D.Linecast(b, e, self.blockingLayer)
+    local hit = UE.Physics2D.Linecast(Vector2(b.x,b.y), Vector2(e.x,e.y), self.blocking_layer)
     self.c2d.enabled = true
-    if not hit then
+    if not hit.transform then
         coroutine.start(function()
             local sqrd = (e-b):SqrMagnitude()
             while sqrd > Mathf.Epsilon do
-                local np = Vector3.MoveTowards(b,e,self.inv_move_time * Time.deltaTime)
-                self.transform.localPosition = np
+                local np = Vector3.MoveTowards(self.transform.position,e,self.inv_move_time * Time.deltaTime)
+                self.transform.position = np
                 coroutine.step()
             end
         end)
@@ -44,7 +46,7 @@ end
 -- @param self
 function MovingObject:AttemptMove(dx,dy)
     local canmove, hit = self:Move(dx,dy)
-    if not canmove and hit then
+    if not canmove then
         self:onCantMove(hit)
     end
 end
