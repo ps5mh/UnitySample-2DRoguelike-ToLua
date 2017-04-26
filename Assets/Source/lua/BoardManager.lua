@@ -7,6 +7,18 @@ local GOInst = UE.GameObject.Instantiate
 -- @type BoardManager
 -- @extends Game_LuaBehaviour#LuaBehaviour
 local BoardManager = {} BoardManager.__index = BoardManager
+BoardManager.walls = nil -- System_Array#Array
+BoardManager.floors = nil -- System_Array#Array
+BoardManager.enemies = nil -- System_Array#Array
+BoardManager.foods = nil -- System_Array#Array
+BoardManager.outer_walls = nil -- System_Array#Array
+BoardManager.exit = nil -- UnityEngine_GameObject#GameObject
+BoardManager.rows = 9
+BoardManager.columns = 9
+BoardManager.wall_count_min = 0
+BoardManager.wall_count_max = 4
+BoardManager.food_count_min = 1
+BoardManager.food_count_max = 4
 
 ---
 -- @function [parent=#BoardManager] Awake

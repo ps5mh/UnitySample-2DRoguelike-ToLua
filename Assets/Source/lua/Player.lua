@@ -6,13 +6,13 @@ local GameManager = require"GameManager"
 
 ---
 -- @type Player
--- @field [parent=#Player] wall_damage
--- @field [parent=#Player] points_per_food
--- @field [parent=#Player] points_per_soda
--- @field [parent=#Player] restart_level_delay
 -- @extends MovingObject#MovingObject
 local Player = {} Player.__index = Player
 setmetatable(Player, MovingObject)
+Player.wall_damage = 1
+Player.points_per_food = 10
+Player.points_per_soda = 20
+Player.restart_level_delay = 1
 
 ---
 -- @function [parent=#Player] Awake

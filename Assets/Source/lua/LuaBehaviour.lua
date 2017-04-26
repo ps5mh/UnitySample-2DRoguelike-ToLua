@@ -31,16 +31,16 @@ function GetLuaComponent(go, lua_module_name)
     end
 end
 
-function LuaBehaviour.__awake(csharp_pbj)
-    if csharp_pbj.__peer.Awake then csharp_pbj:Awake() end
+function LuaBehaviour.__awake(csharp_obj)
+    if csharp_obj.__peer.Awake then csharp_obj:Awake() end
 end
 
-function LuaBehaviour.__start(csharp_pbj)
-    if csharp_pbj.__peer.Start then csharp_pbj:Start() end
+function LuaBehaviour.__start(csharp_obj)
+    if csharp_obj.__peer.Start then csharp_obj:Start() end
 end
 
-function LuaBehaviour.__on_destroy(csharp_pbj)
-    if csharp_pbj.__peer.OnDestroy then csharp_pbj:OnDestroy() end
+function LuaBehaviour.__on_destroy(csharp_obj)
+    if csharp_obj.__peer.OnDestroy then csharp_obj:OnDestroy() end
 end
 
 return LuaBehaviour
