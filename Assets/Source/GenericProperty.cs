@@ -1,23 +1,24 @@
 using System;
+using UnityEditor;
 using UnityEngine;
 
-public enum GenericPropertyType {
+public enum GenericPropertyType : byte {
     Float = 0,
     GameObject = 1,
-    GameObjectArray = 2,
     LayerMask = 3,
-    Sprite = 4
+    Sprite = 4,
+    
+    // below are arrays
+    GameObjectArray = 50,
 }
-
 
 [Serializable]
 public class GenericProperty {
     public string name;
-    public GenericPropertyType type;
 
-    public float floatval;
-    public UnityEngine.GameObject goval;
-    public UnityEngine.GameObject[] goarrval;
+    [SerializeField] private GenericPropertyType type;
+    [SerializeField] private float floatval;
+    [SerializeField] private UnityEngine.GameObject[] goarrval;
     public LayerMask layermaskval;
     public Sprite spriteval;
 
@@ -25,7 +26,7 @@ public class GenericProperty {
         if (type == GenericPropertyType.Float) {
             return floatval;
         } else if (type == GenericPropertyType.GameObject) {
-            return goval;
+            return goarrval.Length > 0 ? goarrval[0] : null;
         } else if (type == GenericPropertyType.GameObjectArray) {
             return goarrval;
         } else if (type == GenericPropertyType.LayerMask) {

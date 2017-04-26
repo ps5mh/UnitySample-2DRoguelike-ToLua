@@ -7,8 +7,7 @@ local UE = UnityEngine
 -- @extends UnityEngine_MonoBehaviour#MonoBehaviour
 local GameManager = {instance = nil}
 GameManager.__index = GameManager
----
--- @field [parent=#GameManager] player_food_points
+GameManager.player_food_points = 100
 
 ---
 -- @function [parent=#GameManager] Awake
