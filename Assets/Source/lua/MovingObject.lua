@@ -5,7 +5,7 @@ local instance
 
 ---
 -- @type MovingObject
--- @extends Game_MovingObject#MovingObject
+-- @extends Game_LuaBehaviour#LuaBehaviour
 local MovingObject = {} MovingObject.__index = MovingObject
 ---
 -- @field [parent=#MovingObject] move_time
