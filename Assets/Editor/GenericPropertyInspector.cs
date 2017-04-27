@@ -15,10 +15,13 @@ public class LuaBehaviourEditor : Editor {
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Add Field")) {
             pproperties.InsertArrayElementAtIndex(pproperties.arraySize);
-            // i just don't know why unity duplicates the last in array, as it do this, 
+            // i just don't know why unity duplicates the last in array, but as it did this, 
             // we clear the array object in the last element created, may avoid unused data.
             // reference https://answers.unity3d.com/questions/1208150/insert-new-custom-class-element-with-default-value.html
-            pproperties.GetArrayElementAtIndex(pproperties.arraySize-1).FindPropertyRelative("goarrval").ClearArray();
+            var inserted = pproperties.GetArrayElementAtIndex(pproperties.arraySize - 1);
+            for (int i = 1; i < (int)GenericPropertyType.SUPPORTED_TYPE_COUNT; i++) {
+                inserted.FindPropertyRelative(string.Format("val{0:00}", i)).ClearArray();
+            }
         }
         if (GUILayout.Button("Remove Field")) {
             pproperties.DeleteArrayElementAtIndex(pproperties.arraySize-1);
@@ -40,29 +43,29 @@ public class LuaBehaviourEditor : Editor {
             EditorGUILayout.BeginHorizontal();
             var pname = pitem.FindPropertyRelative("name");
             var ptype = pitem.FindPropertyRelative("type");
+            EditorGUILayout.PropertyField(pname, GUIContent.none, true);
+            EditorGUILayout.PropertyField(ptype, GUIContent.none, true);
             GenericPropertyType type = (GenericPropertyType)ptype.intValue;
-            if (type < GenericPropertyType.GameObjectArray) {
-                EditorGUILayout.PropertyField(pname, GUIContent.none, true);
-                EditorGUILayout.PropertyField(ptype, GUIContent.none, true);
-                if (type == GenericPropertyType.Float) {
-                    EditorGUILayout.PropertyField(pitem.FindPropertyRelative("floatval"), GUIContent.none, true);
-                } else if (type == GenericPropertyType.GameObject) {
-                    var goarr = pitem.FindPropertyRelative("goarrval"); // reuse goarrval[1]
-                    goarr.arraySize = 1; var go1 = goarr.GetArrayElementAtIndex(0);
-                    EditorGUILayout.PropertyField(go1, GUIContent.none, true);
-                } else if (type == GenericPropertyType.LayerMask) {
-                    EditorGUILayout.PropertyField(pitem.FindPropertyRelative("layermaskval"), GUIContent.none, true);
-                } else if (type == GenericPropertyType.Sprite) {
-                    EditorGUILayout.PropertyField(pitem.FindPropertyRelative("spriteval"), GUIContent.none, true);
-                }
+            int type_field_no = ptype.intValue;
+            if (type_field_no > (int)GenericPropertyType.ARRAY_TYPE_START)
+                type_field_no -= (int)GenericPropertyType.ARRAY_TYPE_START;
+            var field_name = string.Format("val{0:00}", type_field_no);
+            var pfieldarr = pitem.FindPropertyRelative(field_name);
+            if (pfieldarr == null) {
+                EditorGUILayout.EndHorizontal();
+                continue;
+            }
+            if (type < GenericPropertyType.ARRAY_TYPE_START) {
+                pfieldarr.arraySize = 1; var v = pfieldarr.GetArrayElementAtIndex(0);
+                EditorGUILayout.PropertyField(v, GUIContent.none, true);
                 EditorGUILayout.EndHorizontal();
             } else {
-                EditorGUILayout.PropertyField(pname, GUIContent.none, true);
-                EditorGUILayout.PropertyField(ptype, GUIContent.none, true);
-                if (type == GenericPropertyType.GameObjectArray) {
-                    EditorGUILayout.PropertyField(pitem.FindPropertyRelative("goarrval"), new GUIContent(pname.stringValue), true, GUILayout.MinWidth(250));
-                }
+                EditorGUILayout.PropertyField(pfieldarr, new GUIContent(pname.stringValue), true, GUILayout.MinWidth(250));
                 EditorGUILayout.EndHorizontal();
+            }
+            for (int j = 1; j < (int)GenericPropertyType.SUPPORTED_TYPE_COUNT; j++) {
+                if (j == type_field_no) continue;
+                pitem.FindPropertyRelative(string.Format("val{0:00}", j)).ClearArray();
             }
         }
     }
