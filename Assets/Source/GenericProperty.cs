@@ -36,6 +36,10 @@ public class GenericProperty {
         var f = field.GetValue(this) as System.Array;
         if (f == null) return null;
         if (f.Length > 0 && this.type < GenericPropertyType.ARRAY_TYPE_START) {
+            if (this.type == GenericPropertyType.LayerMask) {
+                var lm = (LayerMask)f.GetValue(0);
+                return lm.value;
+            }
             return f.GetValue(0);
         } else if (this.type > GenericPropertyType.ARRAY_TYPE_START) {
             return f;

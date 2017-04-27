@@ -5,7 +5,7 @@ local UE = UnityEngine
 ---
 -- @type LuaBehaviour
 -- @extends Game_LuaBehaviour#LuaBehaviour
-LuaBehaviour = { __index = LuaBehaviour }
+LuaBehaviour = {} LuaBehaviour.__index = LuaBehaviour
 
 ---
 -- @function [parent=#LuaBehaviour] __bind

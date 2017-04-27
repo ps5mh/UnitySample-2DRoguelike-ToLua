@@ -85,8 +85,10 @@ end
 -- @param self
 function Player:onCantMove(hit)
     local hit_wall = GetLuaComponent(hit.transform.gameObject, "Wall")
-    hit_wall:DamageWall(self.wall_damage)
-    self.animator:SetTrigger("playerChop")
+    if hit_wall then
+        hit_wall:DamageWall(self.wall_damage)
+        self.animator:SetTrigger("playerChop")
+    end
 end
 
 ---
@@ -109,6 +111,7 @@ end
 -- @function [parent=#Player] DamagePlayer
 -- @param self
 function Player:DamagePlayer(loss)
+    self.food = self.food - loss
 end
 
 ---

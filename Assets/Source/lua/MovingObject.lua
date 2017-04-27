@@ -29,8 +29,8 @@ function MovingObject:Move(dx,dy)
     self.c2d.enabled = true
     if not hit.transform then
         coroutine.start(function()
-            local sqrd = (e-b):SqrMagnitude()
-            while sqrd > Mathf.Epsilon do
+            print("start move from", b, "to", e)
+            while (e-self.transform.position):SqrMagnitude() > Mathf.Epsilon do
                 local np = Vector3.MoveTowards(self.transform.position,e,self.inv_move_time * Time.deltaTime)
                 self.transform.position = np
                 coroutine.step()

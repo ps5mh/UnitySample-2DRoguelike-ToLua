@@ -1,5 +1,6 @@
 local UE = UnityEngine
 local GOInst = UE.GameObject.Instantiate
+local GameManager = require"GameManager"
 ---
 -- @module BoardManager
 
@@ -53,7 +54,8 @@ function BoardManager:GenerateLevel(level)
     -- generate enemy
     local enemy_count = math.floor(math.log(level + 1, 2))
     for i=1, enemy_count do
-        GOInst(self.enemies[math.random(0,self.enemies.Length - 1)], get_rand_pos(), Quaternion.identity, board_holder)
+        local ego = GOInst(self.enemies[math.random(0,self.enemies.Length - 1)], get_rand_pos(), Quaternion.identity, board_holder)
+        GameManager.instance:AddEnemy(GetLuaComponent(ego, "Enemy"))
     end
     -- generate foods
     local food_count = math.random(self.food_count_min,self.food_count_max)

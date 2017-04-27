@@ -56,6 +56,8 @@ namespace Game {
         }
 
         protected void Start() {
+            if (this.peer == null)
+                BroadcastMessage("__lua_bind");
             __start.BeginPCall();
             __start.Push(this);
             __start.PCall();
