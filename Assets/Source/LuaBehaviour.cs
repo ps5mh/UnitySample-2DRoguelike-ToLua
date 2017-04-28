@@ -1,75 +1,88 @@
 ﻿using UnityEngine;
 using LuaInterface;
-using System.Text;
+using System.Reflection;
 using System;
-using System.Collections;
 
 namespace Game {
     [Serializable]
     public class LuaBehaviour : MonoBehaviour {
-        public string luaModuleName;
+        public string luaComponentName;
         public GenericProperty[] properties;
         private LuaTable peer;
+        private LuaTable lua_component;
         private static bool initialized = false;
-        private static LuaFunction __awake;
+
         private static LuaFunction __bind;
-        private static LuaFunction __on_destroy;
-        private static LuaFunction __start;
+        private LuaFunction __Awake;
+        private LuaFunction __Start;
+        private LuaFunction __OnDestroy;
+        private LuaFunction __OnDisable;
+        private LuaFunction __OnTriggerEnter2D;
 
+        private static string[] __check_bind_function_names = 
+            new string[] { "Awake", "Start", "OnDestroy", "OnDisable", "OnTriggerEnter2D" };
 
-        static void __initialize_once() {
+        private static LuaTable __ref_table_remove_stack(int n) {
+            var L = LuaClient.GetMainState();
+            if (!L.lua_istable(-1)) {
+                L.LuaPop(1);
+            }
+            return L.GetTable(L.ToLuaRef());
+        }
+
+        private static void __initialize_once() {
             if (!initialized) {
                 var L = LuaClient.GetMainState();
-                L.Require("LuaBehaviour");
-                __awake = L.GetFunction("LuaBehaviour.__awake");
-                __bind = L.GetFunction("LuaBehaviour.__bind");
-                __start = L.GetFunction("LuaBehaviour.__start");
-                __on_destroy = L.GetFunction("LuaBehaviour.__on_destroy");
+                L.LuaDoString("return require'LuaBehaviour'"); // LuaBehaviour
+                L.LuaGetField(-1, "__bind"); // LuaBehaviour, __bind
+                __bind = L.GetFunction(L.ToLuaRef()); // LuaBehaviour
+                L.LuaPop(1); //
                 initialized = true;
             }
         }
 
-        static LuaTable __lua_bind_object(LuaBehaviour obj, string lua_module_name) {
-            __initialize_once();
-            var L = LuaClient.GetMainState();
-            __bind.BeginPCall();
-            __bind.Push(obj);
-            __bind.Push(lua_module_name);
-            __bind.PCall();
-            var peer = L.GetTable(L.ToLuaRef());
-            __bind.EndPCall();
-            return peer;
+        private void __call_func_with_objs(LuaFunction func, params object[] objs) {
+            if (func == null) return;
+            func.BeginPCall();
+            func.Push(this);
+            foreach (var obj in objs) { func.Push(obj); }
+            func.PCall();
+            func.EndPCall();
         }
 
         protected void __lua_bind() {
             if (peer != null) return;
-            this.peer = __lua_bind_object(this, luaModuleName);
+            __initialize_once();
+            var L = LuaClient.GetMainState();
+            __bind.BeginPCall();
+            __bind.Push(this);
+            __bind.Push(luaComponentName);
+            __bind.PCall();
+            do {
+                lua_component = __ref_table_remove_stack(-1); // 2nd return value lua_component
+                peer = __ref_table_remove_stack(-1);
+                if (lua_component == null || peer == null) break;
+                L.Push(lua_component);
+                foreach (var check_func_name in __check_bind_function_names) {
+                    L.LuaGetField(-1, check_func_name);
+                    if (L.lua_isfunction(-1)) {
+                        var this_field = typeof(LuaBehaviour).GetField("__" + check_func_name, 
+                            BindingFlags.Instance | BindingFlags.NonPublic);
+                        this_field.SetValue(this, L.GetFunction(L.ToLuaRef()));
+                    } else L.LuaPop(1);
+                }
+            } while (false);
+            __bind.EndPCall();
         }
 
         protected void Awake() {
             if (this.peer == null)
                 BroadcastMessage("__lua_bind");
-            __awake.BeginPCall();
-            __awake.Push(this);
-            __awake.PCall();
-            __awake.EndPCall();
+            __call_func_with_objs(__Awake);
         }
-
-        protected void Start() {
-            if (this.peer == null)
-                BroadcastMessage("__lua_bind");
-            __start.BeginPCall();
-            __start.Push(this);
-            __start.PCall();
-            __start.EndPCall();
-        }
-
-        protected void OnDestroy() {
-            if (!LuaClient.Instance) return;
-            __on_destroy.BeginPCall();
-            __on_destroy.Push(this);
-            __on_destroy.PCall();
-            __on_destroy.EndPCall();
-        }
+        protected void Start() { __call_func_with_objs(__Start); }
+        protected void OnDestroy() { __call_func_with_objs(__OnDestroy); }
+        protected void OnDisable() {  __call_func_with_objs(__OnDisable); }
+        protected void OnTriggerEnter2D(Collider2D collision) { __call_func_with_objs(__OnTriggerEnter2D, collision); }
     }
 }

@@ -48,13 +48,6 @@ function GameManager:Update()
 end
 
 ---
--- @function [parent=#GameManager] Start
--- @param self
-function GameManager:Start(e)
-    table.insert(self.enemies,e)
-end
-
----
 -- @function [parent=#GameManager] MoveEnemies
 -- @param self
 function GameManager:MoveEnemies()

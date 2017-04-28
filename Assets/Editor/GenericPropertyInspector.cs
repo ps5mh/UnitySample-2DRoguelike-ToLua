@@ -9,7 +9,7 @@ public class LuaBehaviourEditor : Editor {
     public override void OnInspectorGUI() {
         EditorGUI.indentLevel = 0;
         serializedObject.Update();
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("luaModuleName"), new GUIContent("Lua Module Name"), true);
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("luaComponentName"), new GUIContent("Lua Component Name"), true);
         var pproperties = serializedObject.FindProperty("properties");
         // show add/remove button
         EditorGUILayout.BeginHorizontal();

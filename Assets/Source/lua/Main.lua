@@ -28,7 +28,7 @@ function OnLevelWasLoaded(level)
 	collectgarbage("collect")
 	Time.timeSinceLevelLoad = 0
 	-- enable the game after lua env set up
-    local game = UE.GameObject.Find("Main Camera").transform:Find("GameRoot")
+  local game = UE.GameObject.Find("Main Camera").transform:Find("GameRoot")
 	game.gameObject:SetActive(true)
 end
 
