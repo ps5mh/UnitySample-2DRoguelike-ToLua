@@ -25,7 +25,7 @@ end
 function MovingObject:Move(dx,dy)
     self.c2d.enabled = false
     local b, e = self.transform.position, self.transform.position + Vector3(dx,dy,0)
-    local hit = UE.Physics2D.Linecast(Vector2(b.x,b.y), Vector2(e.x,e.y), self.blocking_layer)
+    local hit = UE.Physics2D.Linecast(Vector2(b.x,b.y), Vector2(e.x,e.y), self.blocking_layer:Get())
     self.c2d.enabled = true
     if not hit.transform then
         coroutine.start(function()
