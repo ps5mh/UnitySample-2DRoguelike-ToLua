@@ -108,13 +108,6 @@ function Player:LoseFood(loss)
 end
 
 ---
--- @function [parent=#Player] DamagePlayer
--- @param self
-function Player:DamagePlayer(loss)
-    self.food = self.food - loss
-end
-
----
 -- @function [parent=#Player] CheckIfGameOver
 -- @param self
 function Player:CheckIfGameOver()

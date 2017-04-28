@@ -51,7 +51,7 @@ end
 function Enemy:onCantMove(hit)
     local player = GetLuaComponent(hit.transform.gameObject, "Player") -- Player#Player
     if player then
-        player:DamagePlayer(self.player_damage)
+        player:LoseFood(self.player_damage)
         self.animator:SetTrigger("enemyAttack")
     end
 end
