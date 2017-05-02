@@ -1,34 +1,39 @@
 local UE = UnityEngine
+local GameManager = require"GameManager"
+local LuaBehaviour = require"LuaBehaviour"
 
-local oprint = print
-function print(...)
-    local args = {...}
-    local top = {}
-    for i = 1, #args do
-        table.insert(top,tostring(args[i]))
-    end
-    oprint(unpack(top))
-end
+-- make print prints tostringed value
+local o_print = print
+function print(...) local a={...} for i=1,select("#",...) do a[i]=tostring(a[i]) end o_print(unpack(a)) end
+math.randomseed(os.time())
 
-function Main()
-    --主入口函数。从这里开始lua逻辑
-    math.randomseed(os.time())
-    UpdateBeat:Add(function()
-        if UE.Input.GetKey(UE.KeyCode.Comma) then
-            local debugger, debug_port = require("ldt_debugger"), 1334
-            debugger(nil,debug_port)
-            package.loaded["System.coroutine"] = nil
-            require("System.coroutine")
-        end
+local function attach_debugger()
+    pcall(function()
+        local debugger, debug_port = require("ldt_debugger"), 1334
+        debugger(nil,debug_port,nil,nil,nil,nil,1)
+        package.loaded["System.coroutine"] = nil
+        require("System.coroutine")
     end)
 end
 
---场景切换通知
+function Main()
+    -- try debugger connect at start & press hot key
+    attach_debugger()
+    UpdateBeat:Add(function()
+        if UE.Input.GetKey(UE.KeyCode.Comma) then
+            attach_debugger()
+        end
+    end)
+    -- enable the game after lua env set up
+    local lua_state = UE.GameObject.Find("LuaState")
+    UE.GameObject.DontDestroyOnLoad(lua_state)
+    local game = UE.GameObject.Find("GameRoot").transform:Find("Game")
+    game.gameObject:SetActive(true)
+end
+
 function OnLevelWasLoaded(level)
 	collectgarbage("collect")
 	Time.timeSinceLevelLoad = 0
-	-- enable the game after lua env set up
-  local game = UE.GameObject.Find("Main Camera").transform:Find("GameRoot")
-	game.gameObject:SetActive(true)
+    GameManager.instance:InitGame()
 end
 

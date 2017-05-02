@@ -2819,13 +2819,13 @@ end
 -- references to native values
 io.base = { output = io.output, stdin = io.stdin, stdout = io.stdout, stderr = io.stderr }
 
-function print(...)
-  local buf = {...}
-  for i=1, select("#", ...) do
-    buf[i] = tostring(buf[i])
-  end
-  io.stdout:write(table.concat(buf, "\t") .. "\n")
-end
+--function print(...)
+--  local buf = {...}
+--  for i=1, select("#", ...) do
+--    buf[i] = tostring(buf[i])
+--  end
+--  io.stdout:write(table.concat(buf, "\t") .. "\n")
+--end
 
 -- Actually change standard output file but still return the "fake" stdout
 function io.output(output)

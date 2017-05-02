@@ -48,14 +48,18 @@ public static class CustomSettings
         //_GT(typeof(TestExport.Space)),
         //-------------------------------------------------------------------
         
-        _GT(typeof(UnityEngine.UI.Button)),
-        _GT(typeof(Game.LuaBehaviour)),
-        _GT(typeof(GenericProperty)),
         _GT(typeof(Collider2D)),
         _GT(typeof(Physics2D)),
         _GT(typeof(RaycastHit2D)),
         _GT(typeof(Sprite)),
         _GT(typeof(SpriteRenderer)),
+        _GT(typeof(UnityEngine.UI.Text)),
+        _GT(typeof(UnityEngine.UI.Button)),
+        _GT(typeof(UnityEngine.SceneManagement.SceneManager)),
+
+        _GT(typeof(Game.LuaBehaviour)),
+        _GT(typeof(GenericProperty)),
+        
         _GT(typeof(Debugger)).SetNameSpace(null), 
 
 #if USING_DOTWEENING

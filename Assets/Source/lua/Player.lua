@@ -20,6 +20,7 @@ Player.restart_level_delay = 1
 function Player:Awake()
     MovingObject.Awake(self)
     self.animator = self.gameObject:GetComponent(typeof(UE.Animator))
+    self.txt_food = UE.GameObject.Find("FoodText"):GetComponent(typeof(UE.UI.Text)) -- UnityEngine_UI_Text#Text
     UpdateBeat:Add(self.Update,self)
 end
 
@@ -55,6 +56,7 @@ end
 -- @param self
 function Player:AttemptMove(dx,dy)
     self.food = self.food - 1
+    self.txt_food.text = "Food: "..self.food
     MovingObject.AttemptMove(self, dx, dy)
     self:CheckIfGameOver()
     GameManager.instance.players_turn = false
@@ -66,16 +68,19 @@ end
 -- @param UnityEngine_Collider2D#Collider2D other
 function Player:OnTriggerEnter2D(other)
     if other.tag == "Exit" then
+        print("Player:OnTriggerEnter2D", "Exit")
         coroutine.start(function()
             coroutine.wait(self.restart_level_delay)
             self:Restart()
-            self.enabled = false
         end)
+        self.enabled = false
     elseif other.tag == "Food" then
         self.food = self.food + self.points_per_food
+        self.txt_food.text = "+"..self.points_per_food .. " Food: "..self.food
         other.gameObject:SetActive(false)
     elseif other.tag == "Soda" then
         self.food = self.food + self.points_per_soda
+        self.txt_food.text = "+"..self.points_per_soda .. " Food: "..self.food
         other.gameObject:SetActive(false)
     end
 end
@@ -96,6 +101,7 @@ end
 -- @param self
 function Player:Restart()
     print("Player:Restart")
+    UE.SceneManagement.SceneManager.LoadScene("rogue2d")
 end
 
 ---
@@ -104,6 +110,7 @@ end
 function Player:LoseFood(loss)
     self.animator:SetTrigger("playerHit")
     self.food = self.food - loss
+    self.txt_food.text = "-"..loss.." Food: "..self.food
     self:CheckIfGameOver()
 end
 
