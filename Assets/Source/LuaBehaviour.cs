@@ -12,15 +12,18 @@ namespace Game {
 
         private LuaTable peer;
         private LuaTable lua_component;
+#pragma warning disable 0649
         private LuaFunction __lb_Awake;
         private LuaFunction __lb_Start;
         private LuaFunction __lb_OnDestroy;
         private LuaFunction __lb_OnEnable;
         private LuaFunction __lb_OnDisable;
+        private LuaFunction __lb_Update;
         private LuaFunction __lb_OnTriggerEnter2D;
-
+#pragma warning restore 0649
         private static LuaFunction __bind_script_func;
         private static LuaState L;
+        private static LuaTable __g_update_beat;
         private static List<FieldInfo> __lua_behaviour_bind_fields;
         private static string __bind_script_function_def = @"
 return function(csharp_obj, lua_component_name)
@@ -28,26 +31,6 @@ return function(csharp_obj, lua_component_name)
     local peer = setmetatable({}, lua_component)
     tolua.setpeer(csharp_obj, peer)
     for _, v in ipairs(csharp_obj.properties:ToTable()) do csharp_obj[v.name] = v:GetValue() end
-    -- make update function work as expected
-    if lua_component.Update and not lua_component.____extended_for_update then
-        if lua_component.OnEnable then
-            local oe = lua_component.OnEnable
-            lua_component.OnEnable = function(s)
-                oe(s) UpdateBeat:Add(lua_component.Update,s)
-            end
-        else
-            lua_component.OnEnable = function(s) UpdateBeat:Add(lua_component.Update,s) end
-        end
-        if lua_component.OnDisable then
-            local od = lua_component.OnDisable
-            lua_component.OnDisable = function(s)
-                od(s) UpdateBeat:Remove(lua_component.Update,s)
-            end
-        else
-            lua_component.OnDisable = function(s) UpdateBeat:Remove(lua_component.Update,s) end
-        end
-        lua_component.____extended_for_update = true
-    end
     return peer, lua_component
 end";
 
@@ -57,7 +40,7 @@ end";
         }
 
         private static void __initialize_once() {
-            if (__bind_script_func == null || !__bind_script_func.IsAlive) {
+            if (__bind_script_func == null) {
                 if (LuaClient.Instance == null) {
                     var lua_state_go = new GameObject("__G__LuaState__");
                     DontDestroyOnLoad(lua_state_go);
@@ -72,11 +55,13 @@ end";
                     if (!field.Name.StartsWith("__lb_")) continue;
                     __lua_behaviour_bind_fields.Add(field);
                 }
+                __g_update_beat = L.GetTable("UpdateBeat");
             }
         }
 
         private void __call_lua_func_with_objs(LuaFunction func, params object[] objs) {
-            if (peer == null || func == null || !func.IsAlive) return;
+            if (peer == null || func == null) return;
+            Debug.Assert(func.IsAlive);
             func.BeginPCall();
             func.Push(this);
             foreach (var obj in objs) { func.Push(obj); }
@@ -113,16 +98,28 @@ end";
                 BroadcastMessage("__lua_bind");
             __call_lua_func_with_objs(__lb_Awake);
         }
-        protected void Start() { __call_lua_func_with_objs(__lb_Start); }
+        protected void Start() {
+            __call_lua_func_with_objs(__lb_Start);
+        }
         protected void OnDestroy() { __call_lua_func_with_objs(__lb_OnDestroy); }
         protected void OnEnable() {
             // OnEnable may be called before Awake
             // reference: http://answers.unity3d.com/questions/372752/does-finction-start-or-awake-run-when-the-object-o.html
             if (this.peer == null)
                 BroadcastMessage("__lua_bind");
+            if (__lb_Update != null) {
+                var lb_UpdateBeat_Add = __g_update_beat.GetLuaFunction("Add");
+                lb_UpdateBeat_Add.Call(__g_update_beat, __lb_Update, this);
+            }
             __call_lua_func_with_objs(__lb_OnEnable);
         }
-        protected void OnDisable() { __call_lua_func_with_objs(__lb_OnDisable); }
+        protected void OnDisable() {
+            __call_lua_func_with_objs(__lb_OnDisable);
+            if (__lb_Update != null) {
+                var lb_UpdateBeat_Add = __g_update_beat.GetLuaFunction("Remove");
+                lb_UpdateBeat_Add.Call(__g_update_beat, __lb_Update, this);
+            }
+        }
         protected void OnTriggerEnter2D(Collider2D collision) { __call_lua_func_with_objs(__lb_OnTriggerEnter2D, collision); }
     }
 }
