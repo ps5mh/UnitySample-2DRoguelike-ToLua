@@ -32,7 +32,6 @@ function GameManager:Awake()
         self:Destroy()
         return
     end
-    UpdateBeat:Add(self.Update,self)
 end
 
 ---

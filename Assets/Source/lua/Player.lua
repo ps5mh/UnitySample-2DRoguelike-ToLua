@@ -21,7 +21,6 @@ function Player:Awake()
     MovingObject.Awake(self)
     self.animator = self.gameObject:GetComponent(typeof(UE.Animator))
     self.txt_food = UE.GameObject.Find("FoodText"):GetComponent(typeof(UE.UI.Text)) -- UnityEngine_UI_Text#Text
-    UpdateBeat:Add(self.Update,self)
 end
 
 ---
@@ -29,6 +28,7 @@ end
 -- @param self
 function Player:Start()
     self.food = GameManager.instance.player_food_points
+    self.txt_food.text = "Food: "..self.food
 end
 
 ---

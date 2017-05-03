@@ -24,16 +24,12 @@ function Main()
             attach_debugger()
         end
     end)
-    -- enable the game after lua env set up
-    local lua_state = UE.GameObject.Find("LuaState")
-    UE.GameObject.DontDestroyOnLoad(lua_state)
-    local game = UE.GameObject.Find("GameRoot").transform:Find("Game")
-    game.gameObject:SetActive(true)
 end
 
 function OnLevelWasLoaded(level)
-	collectgarbage("collect")
-	Time.timeSinceLevelLoad = 0
+    collectgarbage("collect")
+    Time.timeSinceLevelLoad = 0
     GameManager.instance:InitGame()
 end
+
 
