@@ -72,25 +72,15 @@ end";
         protected void __lua_bind() {
             if (peer != null) return;
             __initialize_once();
-            __bind_script_func.BeginPCall(); __bind_script_func.Push(this); __bind_script_func.Push(luaComponentName);
-            __bind_script_func.PCall();
-            do {
-                lua_component = __ref_table_remove_stack(-1); // 2nd return value lua_component, ref for later use
-                peer = __ref_table_remove_stack(-1); // 1st return value peer, ref to keep alive
-                if (lua_component == null || peer == null) break; // shoud log warning
-                L.Push(lua_component);
-                // try ref all binding function from lua component
-                foreach (var field in __lua_behaviour_bind_fields) {
-                    L.LuaGetField(-1, field.Name.Substring("__lb_".Length));
-                    if (L.lua_isfunction(-1)) {
-                        field.SetValue(this, L.GetFunction(L.ToLuaRef()));
-                    } else if (L.lua_isnil(-1)) { L.LuaPop(1); // no such field, just keep ref as null
-                    } else {
-                        // should log warning, lua field with unexpected type
-                    }
-                }
-            } while (false);
-            __bind_script_func.EndPCall();
+            var rtns = __bind_script_func.Call(this, luaComponentName);
+            Debug.Assert(rtns.Length == 2);
+            lua_component = rtns[1] as LuaTable;
+            peer = rtns[0] as LuaTable;
+            // try ref all binding function from lua component
+            foreach (var field in __lua_behaviour_bind_fields) {
+                var lua_func = lua_component.GetLuaFunction(field.Name.Substring("__lb_".Length));
+                field.SetValue(this, lua_func);
+            }
         }
 
         protected void Awake() {
@@ -103,10 +93,6 @@ end";
         }
         protected void OnDestroy() { __call_lua_func_with_objs(__lb_OnDestroy); }
         protected void OnEnable() {
-            // OnEnable may be called before Awake
-            // reference: http://answers.unity3d.com/questions/372752/does-finction-start-or-awake-run-when-the-object-o.html
-            if (this.peer == null)
-                BroadcastMessage("__lua_bind");
             if (__lb_Update != null) {
                 var lb_UpdateBeat_Add = __g_update_beat.GetLuaFunction("Add");
                 lb_UpdateBeat_Add.Call(__g_update_beat, __lb_Update, this);
