@@ -15,15 +15,7 @@ GameManager.instance = nil -- #GameManager
 ---
 -- @function [parent=#GameManager] Awake
 -- @param self
-function GameManager:Awake()
-    self.level = 1
-    self.players_turn = true
-    self.enemies_moving = false
-    self.enemies = {}
-    self.txt_level = nil
-    self.img_level = nil
-    self.doing_setup = false
-    
+function GameManager:Awake()    
     if not GameManager.instance then
         GameManager.instance = self
         self.boardManager = GetLuaComponent(self.gameObject, "BoardManager") -- BoardManager#BoardManager
@@ -32,6 +24,14 @@ function GameManager:Awake()
         self:Destroy()
         return
     end
+    
+    self.level = 1
+    self.players_turn = true
+    self.enemies_moving = false
+    self.enemies = {}
+    self.txt_level = nil
+    self.img_level = nil
+    self.doing_setup = false
 end
 
 ---
