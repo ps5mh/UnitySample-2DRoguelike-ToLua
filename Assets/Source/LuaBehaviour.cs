@@ -30,9 +30,30 @@ return function(csharp_obj, lua_component_name)
     local lua_component = require(lua_component_name)
     local peer = setmetatable({}, lua_component)
     tolua.setpeer(csharp_obj, peer)
-    for _, v in ipairs(csharp_obj.properties:ToTable()) do csharp_obj[v.name] = v:GetValue() end
+	if csharp_obj.properties then
+    	for _, v in ipairs(csharp_obj.properties:ToTable()) do csharp_obj[v.name] = v:GetValue() end
+	end
     return peer, lua_component
 end";
+
+		private static string LUA_COMPONENT_NAME_TO_ADD = "";
+		public static LuaBehaviour AddLuaComponent(GameObject go, string comp_name) {
+			LUA_COMPONENT_NAME_TO_ADD = comp_name;
+			var behaviour = go.AddComponent<LuaBehaviour> ();
+			behaviour.__lua_bind ();
+			return behaviour;
+		}
+
+		public static LuaBehaviour GetLuaComponent(GameObject go, string comp_name) {
+			var comps = go.GetComponents<LuaBehaviour> ();
+			foreach (var comp in comps) {
+				if (comp.luaComponentName == comp_name) {
+					comp.__lua_bind ();
+					return comp;
+				}
+			}
+			return null;
+		}
 
         private static LuaTable __ref_table_remove_stack(int n) {
             if (!L.lua_istable(-1)) L.LuaPop(1);
@@ -72,10 +93,20 @@ end";
         protected void __lua_bind() {
             if (peer != null) return;
             __initialize_once();
-            var rtns = __bind_script_func.Call(this, luaComponentName);
-            Debug.Assert(rtns.Length == 2);
-            lua_component = rtns[1] as LuaTable;
-            peer = rtns[0] as LuaTable;
+			if (luaComponentName == null) {
+				if (LUA_COMPONENT_NAME_TO_ADD == "") {
+					print ("ERROR! Lua Component name is Invalid");
+				}
+				luaComponentName = LUA_COMPONENT_NAME_TO_ADD;
+				LUA_COMPONENT_NAME_TO_ADD = "";
+			}
+			__bind_script_func.BeginPCall ();
+			__bind_script_func.PushGeneric (this);
+			__bind_script_func.PushGeneric (luaComponentName);
+			__bind_script_func.PCall ();
+			this.lua_component = __bind_script_func.CheckLuaTable ();
+			this.peer = __bind_script_func.CheckLuaTable ();
+			__bind_script_func.EndPCall ();
             // try ref all binding function from lua component
             foreach (var field in __lua_behaviour_bind_fields) {
                 var lua_func = lua_component.GetLuaFunction(field.Name.Substring("__lb_".Length));

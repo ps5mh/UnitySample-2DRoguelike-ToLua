@@ -14,6 +14,7 @@ public enum GenericPropertyType : byte {
     // below are arrays, single value type + 50
     ARRAY_TYPE_START = 50,
     GameObjectArray = ARRAY_TYPE_START + GameObject,
+    SpriteArray = ARRAY_TYPE_START + Sprite
 }
 
 [Serializable]
