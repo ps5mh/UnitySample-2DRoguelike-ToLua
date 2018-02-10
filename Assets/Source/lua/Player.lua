@@ -45,10 +45,39 @@ function Player:Update()
     if not GameManager.instance.players_turn then return end
     local horizontal = UE.Input.GetAxisRaw("Horizontal")
     local vertical = UE.Input.GetAxisRaw("Vertical")
+    
+    if horizontal == 0 and vertical == 0 then
+        local touch_pos
+        if (UE.Input.touchCount > 0) then
+            print(nbTouches, " touch(es) detected");
+            local touch = UE.Input.GetTouch(0);
+            touch_pos = touch.position
+        end
+        if UE.Input.GetMouseButtonDown(0) then
+            print("mouse left up");
+            touch_pos = UE.Input.mousePosition
+        end
+        if touch_pos then
+            local camera = UE.Camera.main
+            local wp = camera:ScreenToWorldPoint(touch_pos)
+            local function sign(v) 
+                if v > 0 then return 1 
+                elseif v < 0 then return -1 
+                else return v end
+            end
+            local dx, dy = wp.x - self.transform.position.x, wp.y - self.transform.position.y
+            print(dx,dy)
+            if math.abs(dy) > math.abs(dx) then dx = 0 end
+            horizontal = sign(dx)
+            vertical = sign(dy)
+        end
+    end    
     if horizontal ~= 0 then vertical = 0 end
     if horizontal ~= 0 or vertical ~= 0 then
         self:AttemptMove(horizontal, vertical)
-    end 
+    end
+    
+
 end
 
 ---

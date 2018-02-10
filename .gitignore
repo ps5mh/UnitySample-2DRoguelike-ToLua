@@ -3,3 +3,4 @@ Temp
 *.sln
 *.csproj
 v15
+obj
