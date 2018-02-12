@@ -19,11 +19,13 @@ namespace Game {
         private LuaFunction __lb_OnEnable;
         private LuaFunction __lb_OnDisable;
         private LuaFunction __lb_Update;
+		private LuaFunction __lb_FixedUpdate;
         private LuaFunction __lb_OnTriggerEnter2D;
 #pragma warning restore 0649
         private static LuaFunction __bind_script_func;
         private static LuaState L;
         private static LuaTable __g_update_beat;
+		private static LuaTable __g_fixed_update_beat;
         private static List<FieldInfo> __lua_behaviour_bind_fields;
         private static string __bind_script_function_def = @"
 return function(csharp_obj, lua_component_name)
@@ -77,6 +79,7 @@ end";
                     __lua_behaviour_bind_fields.Add(field);
                 }
                 __g_update_beat = L.GetTable("UpdateBeat");
+				__g_fixed_update_beat = L.GetTable("FixedUpdateBeat");
             }
         }
 
@@ -125,17 +128,25 @@ end";
         protected void OnDestroy() { __call_lua_func_with_objs(__lb_OnDestroy); }
         protected void OnEnable() {
             if (__lb_Update != null) {
-                var lb_UpdateBeat_Add = __g_update_beat.GetLuaFunction("Add");
-                lb_UpdateBeat_Add.Call(__g_update_beat, __lb_Update, this);
+                var Add = __g_update_beat.GetLuaFunction("Add");
+				Add.Call(__g_update_beat, __lb_Update, this);
             }
+			if (__lb_FixedUpdate != null) {
+				var Add = __g_fixed_update_beat.GetLuaFunction("Add");
+				Add.Call(__g_fixed_update_beat, __lb_FixedUpdate, this);
+			}
             __call_lua_func_with_objs(__lb_OnEnable);
         }
         protected void OnDisable() {
             __call_lua_func_with_objs(__lb_OnDisable);
             if (__lb_Update != null) {
-                var lb_UpdateBeat_Add = __g_update_beat.GetLuaFunction("Remove");
-                lb_UpdateBeat_Add.Call(__g_update_beat, __lb_Update, this);
+				var Remove = __g_update_beat.GetLuaFunction("Remove");
+				Remove.Call(__g_update_beat, __lb_Update, this);
             }
+			if (__lb_FixedUpdate != null) {
+				var Remove = __g_fixed_update_beat.GetLuaFunction("Remove");
+				Remove.Call(__g_fixed_update_beat, __lb_FixedUpdate, this);
+			}
         }
         protected void OnTriggerEnter2D(Collider2D collision) { __call_lua_func_with_objs(__lb_OnTriggerEnter2D, collision); }
     }

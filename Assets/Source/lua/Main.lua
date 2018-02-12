@@ -1,11 +1,10 @@
-local UE = UnityEngine
+UE = UnityEngine
+-- make print prints tostringed value
+local o_print = print function print(...) local a={...} for i=1,select("#",...) do a[i]=tostring(a[i]) end o_print(unpack(a)) end
+math.randomseed(os.time())
+
 local GameManager = require"GameManager"
 local LuaBehaviour = require"LuaBehaviour"
-
--- make print prints tostringed value
-local o_print = print
-function print(...) local a={...} for i=1,select("#",...) do a[i]=tostring(a[i]) end o_print(unpack(a)) end
-math.randomseed(os.time())
 
 local function attach_debugger()
     pcall(function()
@@ -29,7 +28,7 @@ end
 function OnLevelWasLoaded(level)
     collectgarbage("collect")
     Time.timeSinceLevelLoad = 0
-    GameManager.instance:InitGame()
+    -- GameManager.instance:InitGame()
 end
 
 

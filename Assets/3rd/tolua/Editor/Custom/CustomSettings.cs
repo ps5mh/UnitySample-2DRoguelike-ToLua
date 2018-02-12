@@ -54,12 +54,13 @@ public static class CustomSettings
         //_GT(typeof(TestExport)),
         //_GT(typeof(TestExport.Space)),
         //-------------------------------------------------------------------        
-                        
-		_GT(typeof(Collider2D)),
-		_GT(typeof(Physics2D)),
-		_GT(typeof(RaycastHit2D)),
-		_GT(typeof(Sprite)),
-		_GT(typeof(SpriteRenderer)),
+        
+		_GT(typeof(SimpleTouchController)).SetNameSpace("Game"),   
+		_GT(typeof(UnityEngine.Collider2D)),
+		_GT(typeof(UnityEngine.Physics2D)),
+		_GT(typeof(UnityEngine.RaycastHit2D)),
+		_GT(typeof(UnityEngine.Sprite)),
+		_GT(typeof(UnityEngine.SpriteRenderer)),
 		_GT(typeof(UnityEngine.Canvas)),
 		_GT(typeof(UnityEngine.UI.Button)),
 		_GT(typeof(UnityEngine.UI.Image)),

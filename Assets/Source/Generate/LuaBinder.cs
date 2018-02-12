@@ -12,6 +12,10 @@ public static class LuaBinder
 		GenericPropertyWrap.Register(L);
 		LuaInterface_DebuggerWrap.Register(L);
 		LuaProfilerWrap.Register(L);
+		L.BeginModule("Game");
+		SimpleTouchControllerWrap.Register(L);
+		Game_LuaBehaviourWrap.Register(L);
+		L.EndModule();
 		L.BeginModule("UnityEngine");
 		UnityEngine_Collider2DWrap.Register(L);
 		UnityEngine_Physics2DWrap.Register(L);
@@ -99,9 +103,6 @@ public static class LuaBinder
 		L.RegFunction("PCMSetPositionCallback", UnityEngine_AudioClip_PCMSetPositionCallback);
 		L.EndModule();
 		L.EndModule();
-		L.BeginModule("Game");
-		Game_LuaBehaviourWrap.Register(L);
-		L.EndModule();
 		L.BeginModule("System");
 		L.RegFunction("Action", System_Action);
 		L.RegFunction("Predicate_int", System_Predicate_int);
@@ -109,6 +110,10 @@ public static class LuaBinder
 		L.RegFunction("Comparison_int", System_Comparison_int);
 		L.RegFunction("Func_int_int", System_Func_int_int);
 		L.RegFunction("Action_UnityEngine_AsyncOperation", System_Action_UnityEngine_AsyncOperation);
+		L.EndModule();
+		L.BeginModule("SimpleTouchController");
+		L.RegFunction("TouchDelegate", SimpleTouchController_TouchDelegate);
+		L.RegFunction("TouchStateDelegate", SimpleTouchController_TouchStateDelegate);
 		L.EndModule();
 		L.EndModule();
 		L.BeginPreLoad();
@@ -604,6 +609,60 @@ public static class LuaBinder
 			{
 				LuaTable self = ToLua.CheckLuaTable(L, 2);
 				Delegate arg1 = DelegateTraits<System.Action<UnityEngine.AsyncOperation>>.Create(func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int SimpleTouchController_TouchDelegate(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateTraits<SimpleTouchController.TouchDelegate>.Create(func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateTraits<SimpleTouchController.TouchDelegate>.Create(func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int SimpleTouchController_TouchStateDelegate(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateTraits<SimpleTouchController.TouchStateDelegate>.Create(func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateTraits<SimpleTouchController.TouchStateDelegate>.Create(func, self);
 				ToLua.Push(L, arg1);
 			}
 			return 1;
