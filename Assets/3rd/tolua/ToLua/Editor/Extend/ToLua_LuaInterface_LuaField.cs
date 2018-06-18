@@ -6,7 +6,7 @@ public class ToLua_LuaInterface_LuaField
     public static string GetDefined =
 @"		try
 		{			
-			LuaField obj = (LuaField)ToLua.CheckObject(L, 1, typeof(LuaField));            
+			LuaInterface.LuaField obj = (LuaInterface.LuaField)ToLua.CheckObject(L, 1, typeof(LuaInterface.LuaField));            
             return obj.Get(L);						
 		}
 		catch (Exception e)
@@ -17,7 +17,7 @@ public class ToLua_LuaInterface_LuaField
     public static string SetDefined =
 @"		try
 		{			
-            LuaField obj = (LuaField)ToLua.CheckObject(L, 1, typeof(LuaField));            
+            LuaInterface.LuaField obj = (LuaInterface.LuaField)ToLua.CheckObject(L, 1, typeof(LuaInterface.LuaField));            
             return obj.Set(L);
         }
         catch (Exception e)

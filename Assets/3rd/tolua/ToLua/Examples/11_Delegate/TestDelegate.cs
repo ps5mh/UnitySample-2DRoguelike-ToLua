@@ -113,13 +113,7 @@ public class TestDelegate: MonoBehaviour
    
     //需要删除的转LuaFunction为委托，不需要删除的直接加或者等于即可
     void Awake()
-    {
-#if UNITY_5 || UNITY_2017
-        Application.logMessageReceived += ShowTips;
-#else
-        Application.RegisterLogCallback(ShowTips);
-#endif
-        new LuaResLoader();
+    {               
         state = new LuaState();
         state.Start();
         LuaBinder.Bind(state);
@@ -151,14 +145,10 @@ public class TestDelegate: MonoBehaviour
 
         DelegateFactory.dict.Add(typeof(TestEventListener.OnClick), TestEventListener_OnClick);
         DelegateFactory.dict.Add(typeof(TestEventListener.VoidDelegate), TestEventListener_VoidDelegate);
-
-        DelegateTraits<TestEventListener.OnClick>.Init(TestEventListener_OnClick);
-        DelegateTraits<TestEventListener.VoidDelegate>.Init(TestEventListener_VoidDelegate);
     }
 
     void CallLuaFunction(LuaFunction func)
-    {
-        tips = "";
+    {        
         func.BeginPCall();
         func.Push(listener);
         func.PCall();
@@ -179,7 +169,7 @@ public class TestDelegate: MonoBehaviour
         }
     }
 
-    public static TestEventListener.OnClick TestEventListener_OnClick(LuaFunction func, LuaTable self, bool flag)
+    public static Delegate TestEventListener_OnClick(LuaFunction func, LuaTable self, bool flag)
     {
         if (func == null)
         {
@@ -206,7 +196,7 @@ public class TestDelegate: MonoBehaviour
         }
     }
 
-    public static TestEventListener.VoidDelegate TestEventListener_VoidDelegate(LuaFunction func, LuaTable self, bool flag)
+    public static Delegate TestEventListener_VoidDelegate(LuaFunction func, LuaTable self, bool flag)
     {
         if (func == null)
         {
@@ -222,8 +212,6 @@ public class TestDelegate: MonoBehaviour
 
     void OnGUI()
     {
-        GUI.Label(new Rect(Screen.width / 2 - 300, Screen.height / 2 - 200, 600, 400), tips);
-
         if (GUI.Button(new Rect(10, 10, 120, 40), " = OnClick1"))
         {
             CallLuaFunction(SetClick1);
@@ -246,14 +234,12 @@ public class TestDelegate: MonoBehaviour
         }
         else if (GUI.Button(new Rect(10, 260, 120, 40), "+ Click1 in C#"))
         {
-            tips = "";
             LuaFunction func = state.GetFunction("DoClick1");
-            TestEventListener.OnClick onClick = (TestEventListener.OnClick)DelegateTraits<TestEventListener.OnClick>.Create(func);
+            TestEventListener.OnClick onClick = (TestEventListener.OnClick)DelegateFactory.CreateDelegate(typeof(TestEventListener.OnClick), func);
             listener.onClick += onClick;
         }        
         else if (GUI.Button(new Rect(10, 310, 120, 40), " - Click1 in C#"))
         {
-            tips = "";
             LuaFunction func = state.GetFunction("DoClick1");
             listener.onClick = (TestEventListener.OnClick)DelegateFactory.RemoveDelegate(listener.onClick, func);
             func.Dispose();
@@ -317,15 +303,7 @@ public class TestDelegate: MonoBehaviour
         }
     }
 
-    string tips = "";    
-
-    void ShowTips(string msg, string stackTrace, LogType type)
-    {
-        tips += msg;
-        tips += "\r\n";
-    }
-
-    void OnApplicationQuit()
+    void OnDestroy()
     {
         SafeRelease(ref AddClick1);
         SafeRelease(ref AddClick2);
@@ -335,10 +313,5 @@ public class TestDelegate: MonoBehaviour
         SafeRelease(ref TestOverride);
         state.Dispose();
         state = null;
-#if UNITY_5 || UNITY_2017
-        Application.logMessageReceived -= ShowTips;
-#else
-        Application.RegisterLogCallback(null);
-#endif    
     }
 }

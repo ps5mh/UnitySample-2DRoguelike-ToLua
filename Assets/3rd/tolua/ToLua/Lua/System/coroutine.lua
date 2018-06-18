@@ -14,8 +14,15 @@ local FrameTimer = FrameTimer
 local CoTimer = CoTimer
 
 local comap = {}
-local pool = {}
 setmetatable(comap, {__mode = "kv"})
+
+---
+-- @module coroutine
+
+---
+-- @type coroutine
+-- @extends coroutine#coroutine
+local coroutine = coroutine
 
 function coroutine.start(f, ...)	
 	local co = create(f)
@@ -23,8 +30,9 @@ function coroutine.start(f, ...)
 	if running() == nil then
 		local flag, msg = resume(co, ...)
 	
-		if not flag then					
-			error(debug.traceback(co, msg))
+		if not flag then		
+			msg = debug.traceback(co, msg)					
+			error(msg)				
 		end					
 	else
 		local args = {...}
@@ -32,21 +40,15 @@ function coroutine.start(f, ...)
 		
 		local action = function()												
 			local flag, msg = resume(co, unpack(args))			
-			timer.func = nil
-			table.insert(pool, timer)
 	
-			if not flag then														
-				error(debug.traceback(co, msg))						
+			if not flag then				
+				timer:Stop()				
+				msg = debug.traceback(co, msg)				
+				error(msg)						
 			end		
 		end
 			
-		if #pool > 0 then
-			timer = table.remove(pool)
-			timer:Reset(action, 0, 1)
-		else
-			timer = FrameTimer.New(action, 0, 1)
-		end
-		
+		timer = FrameTimer.New(action, 0, 1)
 		comap[co] = timer
 		timer:Start()		
 	end
@@ -63,8 +65,9 @@ function coroutine.wait(t, co, ...)
 		local flag, msg = resume(co, unpack(args))
 		
 		if not flag then	
-			timer:Stop()						
-			error(debug.traceback(co, msg))			
+			timer:Stop()			
+			msg = debug.traceback(co, msg)							
+			error(msg)			
 			return
 		end
 	end
@@ -82,22 +85,16 @@ function coroutine.step(t, co, ...)
 	
 	local action = function()						
 		local flag, msg = resume(co, unpack(args))
-		timer.func = nil
-		table.insert(pool, timer)
 	
-		if not flag then																			
-			error(debug.traceback(co, msg))
+		if not flag then							
+			timer:Stop()					
+			msg = debug.traceback(co, msg)					
+			error(msg)
 			return	
 		end		
 	end
 				
-	if #pool > 0 then
-		timer = table.remove(pool)
-		timer:Reset(action, t or 1, 1)
-	else
-		timer = FrameTimer.New(action, t or 1, 1)
-	end
-
+	timer = FrameTimer.New(action, t or 1, 1)
 	comap[co] = timer
 	timer:Start()
 	return yield()
@@ -112,23 +109,17 @@ function coroutine.www(www, co)
 			return		
 		end		
 				
-		timer:Stop()	
-		local flag, msg = resume(co)			
-		timer.func = nil
-		table.insert(pool, timer)	
+		timer:Stop()		
+		local flag, msg = resume(co)		
 			
-		if not flag then												
-			error(debug.traceback(co, msg))			
+		if not flag then						
+			msg = debug.traceback(co, msg)						
+			error(msg)			
 			return			
 		end				
 	end		
-				
-	if #pool > 0 then
-		timer = table.remove(pool)
-		timer:Reset(action, 1, -1)
-	else	
-		timer = FrameTimer.New(action, 1, -1)	
-	end
+					
+	timer = FrameTimer.New(action, 1, -1)	
 	comap[co] = timer	
  	timer:Start()
  	return yield()

@@ -104,8 +104,8 @@ end";
 				LUA_COMPONENT_NAME_TO_ADD = "";
 			}
 			__bind_script_func.BeginPCall ();
-			__bind_script_func.PushGeneric (this);
-			__bind_script_func.PushGeneric (luaComponentName);
+			__bind_script_func.Push (this);
+			__bind_script_func.Push (luaComponentName);
 			__bind_script_func.PCall ();
 			this.lua_component = __bind_script_func.CheckLuaTable ();
 			this.peer = __bind_script_func.CheckLuaTable ();

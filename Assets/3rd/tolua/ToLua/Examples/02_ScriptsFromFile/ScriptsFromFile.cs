@@ -12,7 +12,7 @@ public class ScriptsFromFile : MonoBehaviour
 
 	void Start () 
     {
-#if UNITY_5 || UNITY_2017		
+#if UNITY_5		
         Application.logMessageReceived += Log;
 #else
         Application.RegisterLogCallback(Log);
@@ -53,7 +53,8 @@ public class ScriptsFromFile : MonoBehaviour
     {
         lua.Dispose();
         lua = null;
-#if UNITY_5 || UNITY_2017	
+
+#if UNITY_5		
         Application.logMessageReceived -= Log;
 #else
         Application.RegisterLogCallback(null);

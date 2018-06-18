@@ -27,7 +27,7 @@ using System.Reflection;
 namespace LuaInterface
 {    
     //代表一个反射属性
-    public sealed class LuaField
+    public class LuaField
     {
         FieldInfo field = null;
         Type kclass = null;
@@ -36,7 +36,7 @@ namespace LuaInterface
         public LuaField(FieldInfo info, Type t)
         {
             field = info;
-            kclass = t;            
+            kclass = t;
         }
 
         public int Get(IntPtr L)
@@ -78,22 +78,22 @@ namespace LuaInterface
             {
                 int count = LuaDLL.lua_gettop(L);
 
-                if (count == 3)
-                {
-                    object arg0 = ToLua.CheckVarObject(L, 2, kclass);
+                if (count == 3 && TypeChecker.CheckTypes(L, 2, kclass, typeof(object)))
+                {                    
+                    object arg0 = ToLua.ToVarObject(L, 2);
                     object arg1 = ToLua.ToVarObject(L, 3);
-                    if (arg1 != null) arg1 = TypeChecker.ChangeType(arg1, field.FieldType);
+                    arg1 = TypeChecker.ChangeType(arg1, field.FieldType);
                     field.SetValue(arg0, arg1);
                     return 0;
                 }
-                else if (count == 6)
-                {
-                    object arg0 = ToLua.CheckVarObject(L, 2, kclass);
+                else if (count == 6 && TypeChecker.CheckTypes(L, 2, kclass, typeof(object), typeof(uint), typeof(Binder), typeof(CultureInfo)))
+                {                    
+                    object arg0 = ToLua.ToVarObject(L, 2);
                     object arg1 = ToLua.ToVarObject(L, 3);
-                    if (arg1 != null) arg1 = TypeChecker.ChangeType(arg1, field.FieldType);
-                    BindingFlags arg2 = (BindingFlags)LuaDLL.luaL_checknumber(L, 4);
-                    Binder arg3 = (Binder)ToLua.CheckObject(L, 5, typeof(Binder));
-                    CultureInfo arg4 = (CultureInfo)ToLua.CheckObject(L, 6, typeof(CultureInfo));                    
+                    BindingFlags arg2 = (BindingFlags)LuaDLL.lua_tonumber(L, 4);
+                    Binder arg3 = (Binder)ToLua.ToObject(L, 5);
+                    CultureInfo arg4 = (CultureInfo)ToLua.ToObject(L, 6);
+                    arg1 = TypeChecker.ChangeType(arg1, field.FieldType);
                     field.SetValue(arg0, arg1, arg2, arg3, arg4);
                     return 0;
                 }

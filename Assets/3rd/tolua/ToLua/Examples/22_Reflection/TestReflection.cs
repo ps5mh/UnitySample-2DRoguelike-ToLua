@@ -10,7 +10,8 @@ public class TestReflection : LuaClient
     string script =
 @"    
     require 'tolua.reflection'          
-    tolua.loadassembly('Assembly-CSharp')        
+    tolua.loadassembly('Assembly-CSharp')
+    tolua.loadassembly('mscorlib')         
     local BindingFlags = require 'System.Reflection.BindingFlags'
 
     function DoClick()
@@ -67,7 +68,7 @@ public class TestReflection : LuaClient
 
     protected override LuaFileUtils InitLoader()
     {
-#if UNITY_5 || UNITY_2017
+#if UNITY_5
         Application.logMessageReceived += ShowTips;
 #else
         Application.RegisterLogCallback(ShowTips);
@@ -129,7 +130,7 @@ public class TestReflection : LuaClient
 
     new void OnApplicationQuit()
     {
-#if UNITY_5 || UNITY_2017
+#if UNITY_5
         Application.logMessageReceived += ShowTips;
 #else
         Application.RegisterLogCallback(ShowTips);

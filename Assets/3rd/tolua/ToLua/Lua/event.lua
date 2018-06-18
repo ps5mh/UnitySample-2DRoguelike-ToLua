@@ -11,121 +11,107 @@ local assert = assert
 local rawget = rawget
 local error = error
 local print = print
-local traceback = tolua.traceback
+local traceback = traceback
 local ilist = ilist
 
 local _xpcall = {}
+setmetatable(_xpcall, _xpcall)
 
 _xpcall.__call = function(self, ...)	
+	local flag 	= true	
+	local msg = nil	
+
 	if jit then
 		if nil == self.obj then
-			return xpcall(self.func, traceback, ...)					
+			flag, msg = xpcall(self.func, traceback, ...)					
 		else		
-			return xpcall(self.func, traceback, self.obj, ...)					
+			flag, msg = xpcall(self.func, traceback, self.obj, ...)					
 		end
 	else
 		local args = {...}
 			
 		if nil == self.obj then
 			local func = function() self.func(unpack(args)) end
-			return xpcall(func, traceback)					
+			flag, msg = xpcall(func, traceback)					
 		else		
 			local func = function() self.func(self.obj, unpack(args)) end
-			return xpcall(func, traceback)
+			flag, msg = xpcall(func, traceback)
 		end
-	end	
+	end
+		
+	return flag, msg
 end
 
 _xpcall.__eq = function(lhs, rhs)
 	return lhs.func == rhs.func and lhs.obj == rhs.obj
 end
 
-local function xfunctor(func, obj)	
-	return setmetatable({func = func, obj = obj}, _xpcall)			
+local function xfunctor(func, obj)
+	local st = {func = func, obj = obj}	
+	setmetatable(st, _xpcall)		
+	return st
 end
 
 local _pcall = {}
 
 _pcall.__call = function(self, ...)
+	local flag 	= true	
+	local msg = nil	
+
 	if nil == self.obj then
-		return pcall(self.func, ...)					
+		flag, msg = pcall(self.func, ...)					
 	else		
-		return pcall(self.func, self.obj, ...)					
-	end	
+		flag, msg = pcall(self.func, self.obj, ...)					
+	end
+		
+	return flag, msg
 end
 
 _pcall.__eq = function(lhs, rhs)
 	return lhs.func == rhs.func and lhs.obj == rhs.obj
 end
 
-local function functor(func, obj)	
-	return setmetatable({func = func, obj = obj}, _pcall)			
+local function functor(func, obj)
+	local st = {func = func, obj = obj}		
+	setmetatable(st, _pcall)		
+	return st
 end
 
-local _event = {}
-_event.__index = _event
+---
+-- @type Event
+local _event = 
+{	
+	name	 = "",
+	lock	 = false,
+	keepSafe = false,
+}
 
---废弃
+_event.__index = function(t, k)	
+	return rawget(_event, k)
+end
+
 function _event:Add(func, obj)
-	assert(func)		
-
+	assert(func)
+				
 	if self.keepSafe then			
-		func = xfunctor(func, obj)
+		self.list:push(xfunctor(func, obj))						
 	else
-		func = functor(func, obj)
-	end	
-
-	if self.lock then
-		local node = {value = func, _prev = 0, _next = 0, removed = true}
-		table.insert(self.opList, function() self.list:pushnode(node) end)			
-		return node
-	else
-		return self.list:push(func)
-	end	
-end
-
---废弃
-function _event:Remove(func, obj)	
-	for i, v in ilist(self.list) do							
-		if v.func == func and v.obj == obj then
-			if self.lock then
-				table.insert(self.opList, function() self.list:remove(i) end)				
-			else
-				self.list:remove(i)
-			end
-			break
-		end
+		self.list:push(functor(func, obj))
 	end		
 end
 
-function _event:CreateListener(func, obj)
-	if self.keepSafe then			
-		func = xfunctor(func, obj)
-	else
-		func = functor(func, obj)
-	end	
-	
-	return {value = func, _prev = 0, _next = 0, removed = true}		
-end
+function _event:Remove(func, obj)
+	assert(func)
 
-function _event:AddListener(handle)	
-	assert(handle)
-
-	if self.lock then		
-		table.insert(self.opList, function() self.list:pushnode(handle) end)		
-	else
-		self.list:pushnode(handle)
-	end	
-end
-
-function _event:RemoveListener(handle)	
-	assert(handle)	
-
-	if self.lock then		
-		table.insert(self.opList, function() self.list:remove(handle) end)				
-	else
-		self.list:remove(handle)
-	end
+	for i, v in ilist(self.list) do							
+		if v.func == func and v.obj == obj then
+			if self.lock then
+				self.rmList:push({func = func, obj = obj})		
+			else
+				self.list:remove(i)
+			end
+		end
+	end		
 end
 
 function _event:Count()
@@ -134,10 +120,9 @@ end
 
 function _event:Clear()
 	self.list:clear()
-	self.opList = {}	
+	self.rmList:clear()
 	self.lock = false
 	self.keepSafe = false
-	self.current = nil
 end
 
 function _event:Dump()
@@ -156,34 +141,47 @@ function _event:Dump()
 	print("all function is:", count)
 end
 
-_event.__call = function(self, ...)			
-	local _list = self.list	
-	self.lock = true
-	local ilist = ilist				
+_event.__call = function(self, ...)		
+	local safe = self.keepSafe
+	local _list = self.list
+	local _rmList = self.rmList
+	self.lock = true	
 
-	for i, f in ilist(_list) do		
-		self.current = i						
+	for i, f in ilist(_list) do								
 		local flag, msg = f(...)
 		
-		if not flag then			
-			_list:remove(i)			
+		if not flag then
+			if safe then								
+				_list:remove(i)
+			end
 			self.lock = false		
 			error(msg)				
 		end
-	end	
-
-	local opList = self.opList	
-	self.lock = false		
-
-	for i, op in ipairs(opList) do									
-		op()
-		opList[i] = nil
 	end
+
+	for _, v in ilist(_rmList) do					
+		for i, item in ilist(_list) do							
+			if v.func == item.func and v.obj == item.obj then
+				_list:remove(i)
+				break
+			end 
+		end
+	end
+
+	_rmList:clear()
+
+	self.lock = false			
 end
 
+setmetatable(_event, _event)
+
 function event(name, safe)
-	safe = safe or false
-	return setmetatable({name = name, keepSafe = safe, lock = false, opList = {}, list = list:new()}, _event)				
+	local ev 	= {name = name}	
+	ev.keepSafe	= safe or false
+	ev.rmList	= list:new()	
+	ev.list		= list:new()
+	setmetatable(ev, _event)			
+	return ev
 end
 
 UpdateBeat 		= event("Update", true)
@@ -204,8 +202,8 @@ function Update(deltaTime, unscaledDeltaTime)
 end
 
 function LateUpdate()	
-	LateUpdateBeat()		
-	CoUpdateBeat()		
+	LateUpdateBeat()	
+	CoUpdateBeat()	
 	Time:SetFrameCount()		
 end
 

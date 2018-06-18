@@ -40,12 +40,26 @@ namespace LuaInterface
         }
     }
 
+    public enum LuaValueType
+    {
+        None = 0,
+        Vector3 = 1,
+        Quaternion = 2,
+        Vector2 = 3,
+        Color = 4,
+        Vector4 = 5,
+        Ray = 6,
+        Bounds = 7,
+        Touch = 8,
+        LayerMask = 9,
+        RaycastHit = 10,
+    }
+
     //让byte[] 压入成为lua string 而不是数组 userdata
     //也可以使用LuaByteBufferAttribute来标记byte[]
-    public struct LuaByteBuffer
+    public class LuaByteBuffer
     {        
         public LuaByteBuffer(IntPtr source, int len)
-            : this()            
         {
             buffer = new byte[len];
             Length = len;
@@ -53,32 +67,69 @@ namespace LuaInterface
         }
         
         public LuaByteBuffer(byte[] buf)
-            : this()
         {
             buffer = buf;
             Length = buf.Length;            
         }
 
         public LuaByteBuffer(byte[] buf, int len)
-            : this()
         {            
             buffer = buf;
             Length = len;
         }
 
-        public LuaByteBuffer(System.IO.MemoryStream stream)   
-            : this()         
+        public override bool Equals(object o)
         {
-            buffer = stream.GetBuffer();
-            Length = (int)stream.Length;            
+            if (o == null) return buffer == null;
+            LuaByteBuffer bb = o as LuaByteBuffer;
+
+            if (bb == null || bb.buffer != buffer)
+            {
+                return false;
+            }
+
+            return buffer != null;
         }
 
-        public static implicit operator LuaByteBuffer(System.IO.MemoryStream stream)
+        public static bool operator ==(LuaByteBuffer a, LuaByteBuffer b)
         {
-            return new LuaByteBuffer(stream);
+            if (System.Object.ReferenceEquals(a, b))
+            {
+                return true;
+            }
+
+            object l = a;
+            object r = b;
+
+            if (l == null && r != null)
+            {
+                return b.buffer == null;
+            }
+
+            if (l != null && r == null)
+            {
+                return a.buffer == null;
+            }
+
+            if (a.buffer != b.buffer)
+            {
+                return false;
+            }
+
+            return a.buffer != null;
         }
 
-        public byte[] buffer;    
+        public static bool operator !=(LuaByteBuffer a, LuaByteBuffer b)
+        {
+            return !(a == b);
+        }
+
+        public override int GetHashCode()
+        {
+            return buffer == null ? 0 : buffer.GetHashCode();
+        }
+
+        public byte[] buffer = null;    
 
         public int Length
         {
@@ -90,9 +141,6 @@ namespace LuaInterface
     public class LuaOut<T> { }
     //public class LuaOutMetatable {}
     public class NullObject { }
-
-    //泛型函数参数null代替
-    public struct nil { }
 
     public class LuaDelegate
     {
@@ -193,23 +241,20 @@ namespace LuaInterface
             int count = t.GetArrayRank();
 
             if (count == 1)
-            {                
+            {
                 return "[]";
             }
 
-            using (CString.Block())
+            StringBuilder sb = StringBuilderCache.Acquire();
+            sb.Append('[');
+
+            for (int i = 1; i < count; i++)
             {
-                CString sb = CString.Alloc(64);
-                sb.Append('[');
-
-                for (int i = 1; i < count; i++)
-                {
-                    sb.Append(',');
-                }
-
-                sb.Append(']');
-                return sb.ToString();
+                sb.Append(',');
             }
+
+            sb.Append(']');
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
         public static string GetTypeName(Type t)
@@ -534,28 +579,34 @@ namespace LuaInterface
         [NoToLuaAttribute]
         public EventOp op = EventOp.None;
         [NoToLuaAttribute]
-        public Delegate func = null;
+        public LuaFunction func = null;
         [NoToLuaAttribute]
-        public Type type;
+        public string name = string.Empty;
 
         [NoToLuaAttribute]
-        public EventObject(Type t)
+        public EventObject(string name)
         {
-            type = t;
+            this.name = name;
         }
 
-        public static EventObject operator +(EventObject a, Delegate b)
+        public static EventObject operator +(EventObject a, LuaFunction b)
         {
             a.op = EventOp.Add;
             a.func = b;
             return a;
         }
 
-        public static EventObject operator -(EventObject a, Delegate b)
+        public static EventObject operator -(EventObject a, LuaFunction b)
         {
             a.op = EventOp.Sub;
             a.func = b;
             return a;
+        }
+
+        [NoToLuaAttribute]
+        public override string ToString()
+        {
+            return name;
         }
     }
 }

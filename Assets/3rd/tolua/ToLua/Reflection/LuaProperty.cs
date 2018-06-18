@@ -26,7 +26,7 @@ using System.Reflection;
 namespace LuaInterface
 {
     //代表一个反射属性
-    public sealed class LuaProperty
+    public class LuaProperty
     {
         PropertyInfo property = null;
         Type kclass = null;        
@@ -40,23 +40,23 @@ namespace LuaInterface
 
         public int Get(IntPtr L)
         {
-            int count = LuaDLL.lua_gettop(L);            
+            int count = LuaDLL.lua_gettop(L);
 
-            if (count == 3)
+            if (count == 3 && TypeChecker.CheckTypes(L, 2, kclass, typeof(object[])))
             {
-                object arg0 = ToLua.CheckVarObject(L, 2, kclass);
+                object arg0 = ToLua.ToVarObject(L, 2);
                 object[] arg1 = ToLua.CheckObjectArray(L, 3);
                 object o = property.GetValue(arg0, arg1);                
                 ToLua.Push(L, o);
                 return 1;
             }
-            else if (count == 6)
+            else if (count == 6 && TypeChecker.CheckTypes(L, 2, kclass, typeof(uint), typeof(Binder), typeof(object[]), typeof(CultureInfo)))
             {
-                object arg0 = ToLua.CheckVarObject(L, 2, kclass);
-                BindingFlags arg1 = (BindingFlags)LuaDLL.luaL_checknumber(L, 3);
-                Binder arg2 = (Binder)ToLua.CheckObject(L, 4, typeof(Binder));
+                object arg0 = ToLua.ToVarObject(L, 2);
+                BindingFlags arg1 = (BindingFlags)LuaDLL.lua_tonumber(L, 3);
+                Binder arg2 = (Binder)ToLua.ToObject(L, 4);
                 object[] arg3 = ToLua.CheckObjectArray(L, 5);
-                CultureInfo arg4 = (CultureInfo)ToLua.CheckObject(L, 6, typeof(CultureInfo));
+                CultureInfo arg4 = (CultureInfo)ToLua.ToObject(L, 6);
                 object o = property.GetValue(arg0, arg1, arg2, arg3, arg4);
                 ToLua.Push(L, o);
                 return 1;
@@ -69,26 +69,26 @@ namespace LuaInterface
 
         public int Set(IntPtr L)
         {
-            int count = LuaDLL.lua_gettop(L);            
+            int count = LuaDLL.lua_gettop(L);
 
-            if (count == 4)
+            if (count == 4 && TypeChecker.CheckTypes(L, 2, kclass, typeof(object), typeof(object[])))
             {
-                object arg0 = ToLua.CheckVarObject(L, 2, kclass);
+                object arg0 = ToLua.ToVarObject(L, 2);
                 object arg1 = ToLua.ToVarObject(L, 3);
-                if (arg1 != null) arg1 = TypeChecker.ChangeType(arg1, property.PropertyType);
-                object[] arg2 = ToLua.CheckObjectArray(L, 4);                
+                object[] arg2 = ToLua.CheckObjectArray(L, 4);
+                arg1 = TypeChecker.ChangeType(arg1, property.PropertyType);
                 property.SetValue(arg0, arg1, arg2);
                 return 0;
             }
-            else if (count == 7)
+            else if (count == 7 && TypeChecker.CheckTypes(L, 2, kclass, typeof(object), typeof(uint), typeof(Binder), typeof(object[]), typeof(CultureInfo)))
             {
-                object arg0 = ToLua.CheckVarObject(L, 2, kclass);
+                object arg0 = ToLua.ToVarObject(L, 2);
                 object arg1 = ToLua.ToVarObject(L, 3);
-                if (arg1 != null) arg1 = TypeChecker.ChangeType(arg1, property.PropertyType);
-                BindingFlags arg2 = (BindingFlags)LuaDLL.luaL_checknumber(L, 4);
-                Binder arg3 = (Binder)ToLua.CheckObject(L, 5, typeof(Binder));
+                BindingFlags arg2 = (BindingFlags)LuaDLL.lua_tonumber(L, 4);
+                Binder arg3 = (Binder)ToLua.ToObject(L, 5);
                 object[] arg4 = ToLua.CheckObjectArray(L, 6);
-                CultureInfo arg5 = (CultureInfo)ToLua.CheckObject(L, 7, typeof(CultureInfo));                
+                CultureInfo arg5 = (CultureInfo)ToLua.ToObject(L, 7);
+                arg1 = TypeChecker.ChangeType(arg1, property.PropertyType);
                 property.SetValue(arg0, arg1, arg2, arg3, arg4, arg5);
                 return 0;
             }

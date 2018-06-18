@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using LuaInterface;
 
-public sealed class TestEventListener : MonoBehaviour
+public class TestEventListener : MonoBehaviour
 {
     public delegate void VoidDelegate(GameObject go);
     public delegate void OnClick(GameObject go);    

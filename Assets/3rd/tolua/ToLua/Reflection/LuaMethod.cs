@@ -26,7 +26,7 @@ using System.Reflection;
 namespace LuaInterface
 {
     //代表一个反射函数
-    public sealed class LuaMethod
+    public class LuaMethod
     {        
         MethodInfo method = null;
         List<Type> list = new List<Type>();
@@ -67,8 +67,8 @@ namespace LuaInterface
                 {
                     bool isRef = list[i].IsByRef;
                     Type t0 = isRef ? list[i].GetElementType() : list[i];
-                    object o = ToLua.CheckVarObject(L, i + offset, t0);                    
-                    args[i] = o;
+                    object o = ToLua.CheckVarObject(L, i + offset, t0);
+                    args[i] = TypeChecker.ChangeType(o, t0);
                 }
             }
             

@@ -72,27 +72,21 @@ public class LuaResLoader : LuaFileUtils
             return fileName;
         }
 
+        StringBuilder sb = StringBuilderCache.Acquire();
+
         if (Path.GetExtension(fileName) == ".lua")
         {
-            fileName = fileName.Substring(0, fileName.Length - 4);            
+            fileName = fileName.Substring(0, fileName.Length - 4);
         }
 
-        using (CString.Block())
+        for (int i = 0; i < searchPaths.Count; i++)
         {
-            CString sb = CString.Alloc(512);
-
-            for (int i = 0; i < searchPaths.Count; i++)
-            {
-                sb.Append("\n\tno file '").Append(searchPaths[i]).Append('\'');
-            }
-
-            sb.Append("\n\tno file './Resources/").Append(fileName).Append(".lua'")
-              .Append("\n\tno file '").Append(LuaConst.luaResDir).Append('/')
-			  .Append(fileName).Append(".lua'");
-            sb = sb.Replace("?", fileName);
-
-            return sb.ToString();
+            sb.AppendFormat("\n\tno file '{0}'", searchPaths[i]);
         }
+
+        sb.AppendFormat("\n\tno file ./Resources/?.lua");
+        sb = sb.Replace("?", fileName);
+        return StringBuilderCache.GetStringAndRelease(sb);
     }
 
     byte[] ReadResourceFile(string fileName)

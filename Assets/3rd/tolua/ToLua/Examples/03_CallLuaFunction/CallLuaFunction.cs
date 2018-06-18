@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿//#define TEST_GC
+using UnityEngine;
 using System.Collections;
 using LuaInterface;
 using System;
 
 public class CallLuaFunction : MonoBehaviour 
 {
-    private string script =
+    private string script = 
         @"  function luaFunc(num)                        
                 return num + 1
             end
@@ -14,42 +15,37 @@ public class CallLuaFunction : MonoBehaviour
             test.luaFunc = luaFunc
         ";
 
-    LuaFunction luaFunc = null;
+    LuaFunction func = null;
     LuaState lua = null;
     string tips = null;
 	
 	void Start () 
     {
-#if UNITY_5 || UNITY_2017
+#if !TEST_GC
+    #if UNITY_5
         Application.logMessageReceived += ShowTips;
-#else
+    #else
         Application.RegisterLogCallback(ShowTips);
+    #endif
 #endif
-        new LuaResLoader();
         lua = new LuaState();
         lua.Start();
-        DelegateFactory.Init();        
         lua.DoString(script);
 
         //Get the function object
-        luaFunc = lua.GetFunction("test.luaFunc");
+        func = lua.GetFunction("test.luaFunc");
 
-        if (luaFunc != null)
+        if (func != null)
         {
-            int num = luaFunc.Invoke<int, int>(123456);
-            Debugger.Log("generic call return: {0}", num);
+            //有gc alloc
+            object[] r = func.Call(123456);
+            Debugger.Log("generic call return: {0}", r[0]);
 
-            num = CallFunc();
+            // no gc alloc
+            int num = CallFunc();
             Debugger.Log("expansion call return: {0}", num);
-
-            Func<int, int> Func = luaFunc.ToDelegate<Func<int, int>>();
-            num = Func(123456);
-            Debugger.Log("Delegate call return: {0}", num);
-            
-            num = lua.Invoke<int, int>("test.luaFunc", 123456, true);
-            Debugger.Log("luastate call return: {0}", num);
         }
-
+                
         lua.CheckTop();
 	}
 
@@ -68,29 +64,40 @@ public class CallLuaFunction : MonoBehaviour
 
     void OnDestroy()
     {
-        if (luaFunc != null)
+        if (func != null)
         {
-            luaFunc.Dispose();
-            luaFunc = null;
+            func.Dispose();
+            func = null;
         }
 
         lua.Dispose();
         lua = null;
 
-#if UNITY_5 || UNITY_2017
+#if !TEST_GC
+    #if UNITY_5
         Application.logMessageReceived -= ShowTips;
-#else
+    #else
         Application.RegisterLogCallback(null);
+    #endif
 #endif
     }
 
     int CallFunc()
     {        
-        luaFunc.BeginPCall();                
-        luaFunc.Push(123456);
-        luaFunc.PCall();        
-        int num = (int)luaFunc.CheckNumber();
-        luaFunc.EndPCall();
+        func.BeginPCall();                
+        func.Push(123456);
+        func.PCall();        
+        int num = (int)func.CheckNumber();                    
+        func.EndPCall();
         return num;                
     }
+
+    //在profiler中查看gc alloc
+#if TEST_GC
+    void Update () 
+    {
+        func.Call(123456);
+        //CallFunc();        
+	}
+#endif
 }

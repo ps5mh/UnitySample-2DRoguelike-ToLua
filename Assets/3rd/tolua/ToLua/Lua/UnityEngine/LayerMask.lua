@@ -14,11 +14,13 @@ LayerMask.__index = function(t,k)
 end
 
 LayerMask.__call = function(t,v)
-	return setmetatable({value = value or 0}, LayerMask)
+	return LayerMask.New(v)
 end
 
-function LayerMask.New(value)	
-	return setmetatable({value = value or 0}, LayerMask)		
+function LayerMask.New(value)
+	local layer = {value = value or 0}
+	setmetatable(layer, LayerMask)	
+	return layer
 end
 
 function LayerMask:Get()

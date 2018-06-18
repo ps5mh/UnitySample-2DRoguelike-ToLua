@@ -9,6 +9,8 @@ local setmetatable = setmetatable
 local type = type
 local Mathf = Mathf
 
+---
+-- @type Color
 local Color = {}
 local get = tolua.initget(Color)
 
@@ -27,11 +29,13 @@ Color.__index = function(t,k)
 end
 
 Color.__call = function(t, r, g, b, a)
-	return setmetatable({r = r or 0, g = g or 0, b = b or 0, a = a or 1}, Color)   
+	return Color.New(r, g, b, a)
 end
 
 function Color.New(r, g, b, a)
-	return setmetatable({r = r or 0, g = g or 0, b = b or 0, a = a or 1}, Color)		
+	local v = {r = r or 0, g = g or 0, b = b or 0, a = a or 1}
+	setmetatable(v, Color)
+	return v
 end
 
 function Color:Set(r, g, b, a)

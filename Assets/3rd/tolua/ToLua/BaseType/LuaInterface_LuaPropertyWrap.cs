@@ -18,7 +18,7 @@ public class LuaInterface_LuaPropertyWrap
 	{
 		try
 		{			
-			LuaProperty obj = (LuaProperty)ToLua.CheckObject(L, 1, typeof(LuaProperty));            
+			LuaInterface.LuaProperty obj = (LuaInterface.LuaProperty)ToLua.CheckObject(L, 1, typeof(LuaInterface.LuaProperty));            
             return obj.Get(L);						
 		}
 		catch (Exception e)
@@ -32,7 +32,7 @@ public class LuaInterface_LuaPropertyWrap
 	{
 		try
 		{			
-            LuaProperty obj = (LuaProperty)ToLua.CheckObject(L, 1, typeof(LuaProperty));            
+            LuaInterface.LuaProperty obj = (LuaInterface.LuaProperty)ToLua.CheckObject(L, 1, typeof(LuaInterface.LuaProperty));            
             return obj.Set(L);
         }
         catch (Exception e)

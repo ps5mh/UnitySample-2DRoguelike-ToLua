@@ -49,7 +49,7 @@ public class TestABLoader : MonoBehaviour
     {
         string streamingPath = Application.streamingAssetsPath.Replace('\\', '/');
 
-#if UNITY_5 || UNITY_2017
+#if UNITY_5
 #if UNITY_ANDROID && !UNITY_EDITOR
         string main = streamingPath + "/" + LuaConst.osDir + "/" + LuaConst.osDir;
 #else
@@ -84,19 +84,13 @@ public class TestABLoader : MonoBehaviour
 
     void Awake()
     {
-#if UNITY_5 || UNITY_2017
+#if UNITY_5
         Application.logMessageReceived += ShowTips;
 #else
         Application.RegisterLogCallback(ShowTips);
 #endif
         LuaFileUtils file = new LuaFileUtils();
         file.beZip = true;
-#if UNITY_ANDROID && UNITY_EDITOR
-        if (IntPtr.Size == 8)
-        {
-            throw new Exception("can't run this in unity5.x process for 64 bits, switch to pc platform, or run it in android mobile");
-        }
-#endif
         StartCoroutine(LoadBundles());
     }
 
@@ -113,7 +107,7 @@ public class TestABLoader : MonoBehaviour
 
     void OnApplicationQuit()
     {
-#if UNITY_5 || UNITY_2017
+#if UNITY_5
         Application.logMessageReceived -= ShowTips;
 #else
         Application.RegisterLogCallback(null);

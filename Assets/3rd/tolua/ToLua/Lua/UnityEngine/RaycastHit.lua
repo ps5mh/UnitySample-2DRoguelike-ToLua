@@ -17,6 +17,8 @@ RaycastBits =
 }
 	
 local RaycastBits = RaycastBits
+---
+-- @type RaycastHit
 local RaycastHit = {}
 local get = tolua.initget(RaycastHit)
 

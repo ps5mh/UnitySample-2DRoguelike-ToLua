@@ -11,54 +11,31 @@ public class TestCoroutine : MonoBehaviour
     private LuaLooper looper = null;
 
 	void Awake () 
-    {
-#if UNITY_5 || UNITY_2017
-        Application.logMessageReceived += ShowTips;
-#else
-        Application.RegisterLogCallback(ShowTips);
-#endif        
-        new LuaResLoader();
+    {        
         lua  = new LuaState();
         lua.Start();
-        LuaBinder.Bind(lua);
-        DelegateFactory.Init();         
+        LuaBinder.Bind(lua);                
         looper = gameObject.AddComponent<LuaLooper>();
         looper.luaState = lua;
 
-        lua.DoString(luaFile.text, "TestLuaCoroutine.lua");
+        lua.DoString(luaFile.text, "TestCoroutine.cs");
         LuaFunction f = lua.GetFunction("TestCortinue");
         f.Call();
         f.Dispose();
         f = null;        
     }
 
-    void OnApplicationQuit()
+    void OnDestroy()
     {
         looper.Destroy();
         lua.Dispose();
         lua = null;
-#if UNITY_5 || UNITY_2017
-        Application.logMessageReceived -= ShowTips;
-#else
-        Application.RegisterLogCallback(null);
-#endif
-    }
-
-    string tips = null;
-
-    void ShowTips(string msg, string stackTrace, LogType type)
-    {
-        tips += msg;
-        tips += "\r\n";
     }
 
     void OnGUI()
     {
-        GUI.Label(new Rect(Screen.width / 2 - 300, Screen.height / 2 - 200, 600, 400), tips);
-
         if (GUI.Button(new Rect(50, 50, 120, 45), "Start Counter"))
         {
-            tips = null;
             LuaFunction func = lua.GetFunction("StartDelay");
             func.Call();
             func.Dispose();

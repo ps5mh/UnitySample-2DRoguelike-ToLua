@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using LuaInterface;
-using UnityEditor;
 
 using BindType = ToLuaMenu.BindType;
 using System.Reflection;
@@ -10,7 +9,7 @@ using System.Reflection;
 public static class CustomSettings
 {
     public static string saveDir = Application.dataPath + "/Source/Generate/";    
-    public static string toluaBaseType = Application.dataPath + "/3rd/tolua/ToLua/BaseType/";    
+    public static string toluaBaseType = Application.dataPath + "/ToLua/BaseType/";    
 
     //导出时强制做为静态类的类型(注意customTypeList 还要添加这个类型才能导出)
     //unity 有些类作为sealed class, 其实完全等价于静态类
@@ -26,7 +25,6 @@ public static class CustomSettings
         typeof(UnityEngine.RenderSettings),
         typeof(UnityEngine.QualitySettings),
         typeof(UnityEngine.GL),
-        typeof(UnityEngine.Graphics),
     };
 
     //附加导出委托类型(在导出委托时, customTypeList 中牵扯的委托类型都会导出， 无需写在这里)
@@ -37,7 +35,6 @@ public static class CustomSettings
         _DT(typeof(System.Predicate<int>)),
         _DT(typeof(System.Action<int>)),
         _DT(typeof(System.Comparison<int>)),
-        _DT(typeof(System.Func<int, int>)),
     };
 
     //在这里添加你要导出注册到lua的类型列表
@@ -48,30 +45,27 @@ public static class CustomSettings
         //_GT(typeof(TestProtol)),
         //_GT(typeof(TestAccount)),
         //_GT(typeof(Dictionary<int, TestAccount>)).SetLibName("AccountMap"),
-        //_GT(typeof(KeyValuePair<int, TestAccount>)),
-        //_GT(typeof(Dictionary<int, TestAccount>.KeyCollection)),
-        //_GT(typeof(Dictionary<int, TestAccount>.ValueCollection)),
+        //_GT(typeof(KeyValuePair<int, TestAccount>)),    
         //_GT(typeof(TestExport)),
         //_GT(typeof(TestExport.Space)),
         //-------------------------------------------------------------------        
-        
-		_GT(typeof(SimpleTouchController)).SetNameSpace("Game"),   
-		_GT(typeof(UnityEngine.Collider2D)),
-		_GT(typeof(UnityEngine.Physics2D)),
-		_GT(typeof(UnityEngine.RaycastHit2D)),
-		_GT(typeof(UnityEngine.Sprite)),
-		_GT(typeof(UnityEngine.SpriteRenderer)),
-		_GT(typeof(UnityEngine.Canvas)),
-		_GT(typeof(UnityEngine.UI.Button)),
-		_GT(typeof(UnityEngine.UI.Image)),
-		_GT(typeof(UnityEngine.UI.Text)),
-		_GT(typeof(UnityEngine.RectTransform)),
-		_GT(typeof(UnityEngine.Rect)),
-		_GT(typeof(UnityEngine.SceneManagement.SceneManager)),
-		_GT(typeof(Game.LuaBehaviour)),
-		_GT(typeof(GenericProperty)),
+        _GT(typeof(SimpleTouchController)).SetNameSpace("Game"),   
+        _GT(typeof(UnityEngine.Collider2D)),
+        _GT(typeof(UnityEngine.Physics2D)),
+        _GT(typeof(UnityEngine.RaycastHit2D)),
+        _GT(typeof(UnityEngine.Sprite)),
+        _GT(typeof(UnityEngine.SpriteRenderer)),
+        _GT(typeof(UnityEngine.Canvas)),
+        _GT(typeof(UnityEngine.UI.Button)),
+        _GT(typeof(UnityEngine.UI.Image)),
+        _GT(typeof(UnityEngine.UI.Text)),
+        _GT(typeof(UnityEngine.RectTransform)),
+        _GT(typeof(UnityEngine.Rect)),
+        _GT(typeof(UnityEngine.SceneManagement.SceneManager)),
+        _GT(typeof(Game.LuaBehaviour)),
+        _GT(typeof(GenericProperty)),
 
-        _GT(typeof(Debugger)).SetNameSpace(null),          
+        _GT(typeof(Debugger)).SetNameSpace(null),        
 
 #if USING_DOTWEENING
         _GT(typeof(DG.Tweening.DOTween)),
@@ -141,7 +135,7 @@ public static class CustomSettings
         _GT(typeof(ParticleRenderer)),
         _GT(typeof(ParticleAnimator)), 
 #endif
-
+                              
         _GT(typeof(BoxCollider)),
         _GT(typeof(MeshCollider)),
         _GT(typeof(SphereCollider)),        
@@ -160,8 +154,7 @@ public static class CustomSettings
         _GT(typeof(RenderSettings)),                                                   
         _GT(typeof(BlendWeights)),           
         _GT(typeof(RenderTexture)),
-        _GT(typeof(Resources)),     
-        _GT(typeof(LuaProfiler)),
+        _GT(typeof(Resources)),
     };
 
     public static List<Type> dynamicList = new List<Type>()
@@ -194,47 +187,6 @@ public static class CustomSettings
     {
         
     };
-        
-    //ngui优化，下面的类没有派生类，可以作为sealed class
-    public static List<Type> sealedList = new List<Type>()
-    {
-        /*typeof(Transform),
-        typeof(UIRoot),
-        typeof(UICamera),
-        typeof(UIViewport),
-        typeof(UIPanel),
-        typeof(UILabel),
-        typeof(UIAnchor),
-        typeof(UIAtlas),
-        typeof(UIFont),
-        typeof(UITexture),
-        typeof(UISprite),
-        typeof(UIGrid),
-        typeof(UITable),
-        typeof(UIWrapGrid),
-        typeof(UIInput),
-        typeof(UIScrollView),
-        typeof(UIEventListener),
-        typeof(UIScrollBar),
-        typeof(UICenterOnChild),
-        typeof(UIScrollView),        
-        typeof(UIButton),
-        typeof(UITextList),
-        typeof(UIPlayTween),
-        typeof(UIDragScrollView),
-        typeof(UISpriteAnimation),
-        typeof(UIWrapContent),
-        typeof(TweenWidth),
-        typeof(TweenAlpha),
-        typeof(TweenColor),
-        typeof(TweenRotation),
-        typeof(TweenPosition),
-        typeof(TweenScale),
-        typeof(TweenHeight),
-        typeof(TypewriterEffect),
-        typeof(UIToggle),
-        typeof(Localization),*/
-    };
 
     public static BindType _GT(Type t)
     {
@@ -245,28 +197,4 @@ public static class CustomSettings
     {
         return new DelegateType(t);
     }    
-
-
-    [MenuItem("Lua/Attach Profiler", false, 151)]
-    static void AttachProfiler()
-    {
-        if (!Application.isPlaying)
-        {
-            EditorUtility.DisplayDialog("警告", "请在运行时执行此功能", "确定");
-            return;
-        }
-
-        LuaClient.Instance.AttachProfiler();
-    }
-
-    [MenuItem("Lua/Detach Profiler", false, 152)]
-    static void DetachProfiler()
-    {
-        if (!Application.isPlaying)
-        {            
-            return;
-        }
-
-        LuaClient.Instance.DetachProfiler();
-    }
 }

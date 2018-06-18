@@ -9,34 +9,16 @@ using System.IO;
 using ProtoBuf;
 
 [ProtoContract]
-class Header
-{
-    [ProtoMember(1, IsRequired = true)]
-    public int cmd { get; set; }
-
-    [ProtoMember(2, IsRequired = true)]
-    public int seq { get; set; }
-}
-
-[ProtoContract]
 class Person
 {
     [ProtoMember(1, IsRequired = true)]
-    public Header header { get; set; }
-    [ProtoMember(2, IsRequired = true)]
-    public long id { get; set; }
+    public int id { get; set; }
 
-    [ProtoMember(3, IsRequired = true)]
+    [ProtoMember(2, IsRequired = true)]
     public string name { get; set; }
 
-    [ProtoMember(4, IsRequired = false)]
-    public int age { get; set; }
-
-    [ProtoMember(5, IsRequired = false)]
+    [ProtoMember(3, IsRequired = false)]
     public string email { get; set; }
-
-    [ProtoMember(6, IsRequired = true)]
-    public int[] array;
 }
 
 #endif
@@ -44,30 +26,20 @@ class Person
 public class TestProtoBuffer : LuaClient
 {
     private string script = @"      
-        local common_pb = require 'Protol.common_pb'
         local person_pb = require 'Protol.person_pb'
        
         function Decoder()  
             local msg = person_pb.Person()
             msg:ParseFromString(TestProtol.data)
-            --tostring 不会打印默认值
-            print('person_pb decoder: '..tostring(msg)..'age: '..msg.age..'\nemail: '..msg.email)
+            print('person_pb decoder: '..tostring(msg))
         end
 
-        function Encoder()                     
-            local msg = person_pb.Person()                                 
-            msg.header.cmd = 10010                                 
-            msg.header.seq = 1
-            msg.id = '1223372036854775807'            
-            msg.name = 'foo'              
-            --数组添加                              
-            msg.array:append(1)                              
-            msg.array:append(2)            
-            --extensions 添加
-            local phone = msg.Extensions[person_pb.Phone.phones]:add()
-            phone.num = '13788888888'      
-            phone.type = person_pb.Phone.MOBILE      
-            local pb_data = msg:SerializeToString()                   
+        function Encoder()                           
+            local msg = person_pb.Person()
+            msg.id = 1024
+            msg.name = 'foo'
+            msg.email = 'bar'                                    
+            local pb_data = msg:SerializeToString()
             TestProtol.data = pb_data
         end
         ";
@@ -80,12 +52,12 @@ public class TestProtoBuffer : LuaClient
     //pb_data = msg.data    
     new void Awake()
     {
-#if UNITY_5 || UNITY_2017
+#if UNITY_5		
         Application.logMessageReceived += ShowTips;
 #else
         Application.RegisterLogCallback(ShowTips);
 #endif  
-        base.Awake();
+        base.Awake();            
     }
 
     protected override LuaFileUtils InitLoader()
@@ -106,14 +78,14 @@ public class TestProtoBuffer : LuaClient
     protected override void CallMain() { }
 
     protected override void OnLoadFinished()
-    {
+    {                
         base.OnLoadFinished();
         luaState.DoString(script, "TestProtoBuffer.cs");
 
 #if !USE_PROTOBUF_NET
         LuaFunction func = luaState.GetFunction("Encoder");
         func.Call();
-        func.Dispose();
+        func.Dispose();        
 
         func = luaState.GetFunction("Decoder");
         func.Call();
@@ -121,17 +93,14 @@ public class TestProtoBuffer : LuaClient
         func = null;
 #else
         Person data = new Person();
-        data.id = 1223372036854775807;
+        data.id = 2048;
         data.name = "foo";
-        data.header = new Header();
-        data.header.cmd = 10086;
-        data.header.seq = 1;
-        data.array = new int[2];
-        data.array[0] = 1;
-        data.array[1] = 2;
+        data.email = "bar";
         MemoryStream stream = new MemoryStream();
         Serializer.Serialize<Person>(stream, data);
-        TestProtol.data = stream.ToArray();
+        byte[] buffer = stream.ToArray();
+
+        TestProtol.data = new LuaByteBuffer(buffer);
 
         LuaFunction func = luaState.GetFunction("Decoder");
         func.Call();
@@ -143,9 +112,9 @@ public class TestProtoBuffer : LuaClient
         func.Dispose();
         func = null;
 
-        stream = new MemoryStream(TestProtol.data);
+        stream = new MemoryStream(TestProtol.data.buffer);
         data = Serializer.Deserialize<Person>(stream);
-        Debugger.Log("Decoder from lua int64 is: {0}, cmd: {1}", data.id, data.header.cmd);
+        Debugger.Log("Decoder from lua fixed64 is: {0}", data.id);
 #endif
     }
 
@@ -156,13 +125,13 @@ public class TestProtoBuffer : LuaClient
 
     void OnGUI()
     {
-        GUI.Label(new Rect(Screen.width / 2 - 250, Screen.height / 2 - 200, 500, 500), tips);
+        GUI.Label(new Rect(Screen.width / 2 - 200, Screen.height / 2 - 100, 400, 300), tips);
     }
 
     new void OnApplicationQuit()
     {
         base.Destroy();
-#if UNITY_5 || UNITY_2017
+#if UNITY_5
         Application.logMessageReceived -= ShowTips;
 #else
         Application.RegisterLogCallback(null);

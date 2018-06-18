@@ -6,7 +6,7 @@ public class ToLua_System_Enum
     public static string ToIntDefined =
 @"		try
         {
-            object arg0 = ToLua.CheckObject<System.Enum>(L, 1);
+            object arg0 = ToLua.CheckObject(L, 1, typeof(System.Enum));
             int ret = Convert.ToInt32(arg0);
             LuaDLL.lua_pushinteger(L, ret);
             return 1;
@@ -21,7 +21,7 @@ public class ToLua_System_Enum
 		{
 			int count = LuaDLL.lua_gettop(L);
 
-			if (count == 2 && TypeChecker.CheckTypes<System.Type, string>(L, 1))
+			if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string)))
 			{
 				System.Type arg0 = (System.Type)ToLua.ToObject(L, 1);
 				string arg1 = ToLua.ToString(L, 2);
@@ -29,7 +29,7 @@ public class ToLua_System_Enum
 				ToLua.Push(L, (Enum)o);
 				return 1;
 			}
-			else if (count == 3 && TypeChecker.CheckTypes<System.Type, string, bool>(L, 1))
+			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(string), typeof(bool)))
 			{
 				System.Type arg0 = (System.Type)ToLua.ToObject(L, 1);
 				string arg1 = ToLua.ToString(L, 2);
@@ -53,7 +53,7 @@ public class ToLua_System_Enum
 		{
 			int count = LuaDLL.lua_gettop(L);
 
-			if (count == 2 && TypeChecker.CheckTypes<System.Type, int>(L, 1))
+			if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(int)))
 			{
 				System.Type arg0 = (System.Type)ToLua.ToObject(L, 1);
 				int arg1 = (int)LuaDLL.lua_tonumber(L, 2);
@@ -61,7 +61,7 @@ public class ToLua_System_Enum
 				ToLua.Push(L, (Enum)o);
 				return 1;
 			}
-			else if (count == 2 && TypeChecker.CheckTypes<System.Type, object>(L, 1))
+			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(System.Type), typeof(object)))
 			{
 				System.Type arg0 = (System.Type)ToLua.ToObject(L, 1);
 				object arg1 = ToLua.ToVarObject(L, 2);

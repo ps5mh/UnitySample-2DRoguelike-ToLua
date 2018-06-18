@@ -7,6 +7,11 @@ local rawget = rawget
 local uTime = UnityEngine.Time
 local gettime = tolua.gettime
 
+---
+-- @module Time
+
+---
+-- @type Time
 local _Time = 
 {	
 	deltaTime			= 0,
