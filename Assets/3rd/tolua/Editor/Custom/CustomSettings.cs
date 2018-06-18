@@ -50,7 +50,7 @@ public static class CustomSettings
         //_GT(typeof(TestExport.Space)),
         //-------------------------------------------------------------------        
         _GT(typeof(SimpleTouchController)).SetNameSpace("Game"),   
-        _GT(typeof(UnityEngine.Collider2D)),
+        _GT(typeof(UnityEngine.BoxCollider2D)),
         _GT(typeof(UnityEngine.Physics2D)),
         _GT(typeof(UnityEngine.RaycastHit2D)),
         _GT(typeof(UnityEngine.Sprite)),

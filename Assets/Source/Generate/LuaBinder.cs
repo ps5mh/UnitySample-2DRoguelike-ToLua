@@ -16,7 +16,7 @@ public static class LuaBinder
 		Game_LuaBehaviourWrap.Register(L);
 		L.EndModule();
 		L.BeginModule("UnityEngine");
-		UnityEngine_Collider2DWrap.Register(L);
+		UnityEngine_BoxCollider2DWrap.Register(L);
 		UnityEngine_Physics2DWrap.Register(L);
 		UnityEngine_RaycastHit2DWrap.Register(L);
 		UnityEngine_SpriteWrap.Register(L);
@@ -63,6 +63,7 @@ public static class LuaBinder
 		UnityEngine_QualitySettingsWrap.Register(L);
 		UnityEngine_RenderSettingsWrap.Register(L);
 		UnityEngine_ResourcesWrap.Register(L);
+		UnityEngine_Collider2DWrap.Register(L);
 		UnityEngine_CustomYieldInstructionWrap.Register(L);
 		L.BeginModule("UI");
 		UnityEngine_UI_ButtonWrap.Register(L);

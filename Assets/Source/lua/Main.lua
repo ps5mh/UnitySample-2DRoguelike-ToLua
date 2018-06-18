@@ -28,7 +28,7 @@ end
 function OnLevelWasLoaded(level)
     collectgarbage("collect")
     Time.timeSinceLevelLoad = 0
-    -- GameManager.instance:InitGame()
+    GameManager.instance:InitGame()
 end
 
 

@@ -15,7 +15,7 @@ GameManager.instance = nil -- #GameManager
 ---
 -- @function [parent=#GameManager] Awake
 -- @param self
-function GameManager:Awake()    
+function GameManager:Awake()
     if not GameManager.instance then
         GameManager.instance = self
         self.boardManager = GetLuaComponent(self.gameObject, "BoardManager") -- BoardManager#BoardManager
